@@ -9,7 +9,9 @@ import {
   ChevronRight,
   Sparkles,
   Video,
-  Menu
+  Menu,
+  User,
+  LogOut
 } from 'lucide-react';
 import {
   Sidebar,
@@ -22,8 +24,11 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarTrigger,
+  SidebarFooter,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 import manusLogo from '@/assets/manus-logo.png';
 
 const navigationItems = [
@@ -75,6 +80,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
+  const { signOut, user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -137,6 +143,33 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="border-t border-border p-3">
+        <div className="space-y-2">
+          {/* User info */}
+          <div className="flex items-center gap-3 px-2 py-2">
+            <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <div className="text-xs text-muted-foreground truncate">
+                  Welcome back, {user?.email?.split('@')[0] || 'User'}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Sign out button */}
+          <Button 
+            variant="outline" 
+            size={collapsed ? "icon" : "sm"}
+            onClick={signOut}
+            className="w-full justify-start"
+          >
+            <LogOut className="h-4 w-4 flex-shrink-0" />
+            {!collapsed && <span className="ml-2">Sign Out</span>}
+          </Button>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
