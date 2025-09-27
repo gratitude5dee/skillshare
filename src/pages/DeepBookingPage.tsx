@@ -398,7 +398,7 @@ export const DeepBookingPage: React.FC = () => {
           </header>
 
           {/* Content */}
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6 bg-white">
             {/* Stats cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {[
