@@ -377,15 +377,18 @@ Establish ongoing optimization loop for sustained viral content creation.
         .select('*', { count: 'exact' })
         .eq('music_item_id', musicItemId);
 
+      // Get content queue IDs first
+      const { data: contentQueueIds } = await supabase
+        .from('content_queue')
+        .select('id')
+        .eq('music_item_id', musicItemId);
+
       // Get assets count
       const { data: assets } = await supabase
         .from('content_assets')
         .select('asset_type')
         .in('content_queue_id', 
-          await supabase
-            .from('content_queue')
-            .select('id')
-            .eq('music_item_id', musicItemId)
+          contentQueueIds?.map(item => item.id) || []
         );
 
       return {
