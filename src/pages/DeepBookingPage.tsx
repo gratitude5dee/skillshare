@@ -361,7 +361,7 @@ export const DeepBookingPage: React.FC = () => {
         {/* Main content */}
         <div className="flex-1 overflow-auto">
           {/* Header */}
-          <header className="border-b backdrop-blur-xl p-6" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)' }}>
+          <header className="border-b backdrop-blur-xl p-6 bg-white text-black" style={{ borderColor: 'rgba(0,0,0,0.12)' }}>
             <div className="flex items-center justify-between">
               <div className="flex-1 max-w-2xl">
                 <div className="flex items-center gap-3 rounded-2xl border p-3 backdrop-blur-xl" style={{ background: THEME.cardBg, borderColor: 'rgba(255,255,255,0.15)' }}>
