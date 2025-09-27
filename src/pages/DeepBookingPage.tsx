@@ -312,52 +312,6 @@ export const DeepBookingPage: React.FC = () => {
       </div>
 
       <div className="flex h-screen">
-        {/* Sidebar */}
-        <div className="w-64 border-r backdrop-blur-xl" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)' }}>
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <h1 className="font-bold text-white">DeepBooking</h1>
-                <p className="text-xs text-white/60">Booking Platform</p>
-              </div>
-            </div>
-            
-            <nav className="space-y-2">
-              {sidebarItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.label}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                      item.active 
-                        ? 'bg-white/15 text-white' 
-                        : 'text-white/70 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {item.badge && (
-                      <Badge 
-                        variant="secondary" 
-                        className="text-xs px-1.5 py-0.5"
-                        style={{ 
-                          background: item.badge === 'NEW' ? `${THEME.success}20` : `${THEME.accent}20`,
-                          color: item.badge === 'NEW' ? THEME.success : THEME.accent
-                        }}
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-
         {/* Main content */}
         <div className="flex-1 overflow-auto">
           {/* Header */}
