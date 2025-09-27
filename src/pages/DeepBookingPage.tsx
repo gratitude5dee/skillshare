@@ -145,29 +145,29 @@ const VenueCard: React.FC<{ venue: typeof mockVenues[0] }> = ({ venue }) => (
           </Badge>
           <div className="flex items-center gap-1">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            <span className="text-xs text-white/80">{venue.fit_score}</span>
+            <span className="text-xs text-black/80">{venue.fit_score}</span>
           </div>
         </div>
-        <h3 className="text-lg font-semibold text-white mb-1">{venue.name}</h3>
-        <p className="text-sm text-white/70">{venue.city}</p>
+        <h3 className="text-lg font-semibold text-black mb-1">{venue.name}</h3>
+        <p className="text-sm text-black/70">{venue.city}</p>
       </div>
-      <Button size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+      <Button size="sm" className="bg-black/10 hover:bg-black/20 text-black border-black/20">
         <Play className="h-4 w-4" />
       </Button>
     </div>
     
     <div className="space-y-3">
       <div className="flex items-center justify-between text-sm">
-        <span className="text-white/70">Capacity</span>
-        <span className="text-white font-medium">{venue.capacity.toLocaleString()}</span>
+        <span className="text-black/70">Capacity</span>
+        <span className="text-black font-medium">{venue.capacity.toLocaleString()}</span>
       </div>
       <div className="flex items-center justify-between text-sm">
-        <span className="text-white/70">Avg Ticket</span>
-        <span className="text-white font-medium">${venue.avg_ticket}</span>
+        <span className="text-black/70">Avg Ticket</span>
+        <span className="text-black font-medium">${venue.avg_ticket}</span>
       </div>
       <div className="flex items-center justify-between text-sm">
-        <span className="text-white/70">Booker</span>
-        <span className="text-white font-medium">{venue.booker_name}</span>
+        <span className="text-black/70">Booker</span>
+        <span className="text-black font-medium">{venue.booker_name}</span>
       </div>
     </div>
     
@@ -177,9 +177,9 @@ const VenueCard: React.FC<{ venue: typeof mockVenues[0] }> = ({ venue }) => (
           key={genre}
           className="px-2 py-1 text-xs rounded-full border"
           style={{
-            background: 'rgba(255,255,255,0.08)',
-            borderColor: 'rgba(255,255,255,0.15)',
-            color: 'rgba(255,255,255,0.8)'
+            background: 'rgba(0,0,0,0.08)',
+            borderColor: 'rgba(0,0,0,0.15)',
+            color: 'rgba(0,0,0,0.8)'
           }}
         >
           {genre}
@@ -269,16 +269,16 @@ const MapPlaceholder: React.FC = () => (
       />
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <MapPin className="h-12 w-12 text-white/60 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">Interactive Venue Map</h3>
-          <p className="text-white/70">Discover venues across San Francisco Bay Area</p>
+          <MapPin className="h-12 w-12 text-black/60 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-black mb-2">Interactive Venue Map</h3>
+          <p className="text-black/70">Discover venues across San Francisco Bay Area</p>
         </div>
       </div>
       <div className="absolute top-4 right-4 flex gap-2">
-        <Button size="sm" className="bg-white/10 hover:bg-white/20 text-white">
+        <Button size="sm" className="bg-black/10 hover:bg-black/20 text-black">
           <Plus className="h-4 w-4" />
         </Button>
-        <Button size="sm" className="bg-white/10 hover:bg-white/20 text-white">
+        <Button size="sm" className="bg-black/10 hover:bg-black/20 text-black">
           <Filter className="h-4 w-4" />
         </Button>
       </div>
@@ -364,18 +364,18 @@ export const DeepBookingPage: React.FC = () => {
           <header className="border-b backdrop-blur-xl p-6 bg-white text-black" style={{ borderColor: 'rgba(0,0,0,0.12)' }}>
             <div className="flex items-center justify-between">
               <div className="flex-1 max-w-2xl">
-                <div className="flex items-center gap-3 rounded-2xl border p-3 backdrop-blur-xl" style={{ background: THEME.cardBg, borderColor: 'rgba(255,255,255,0.15)' }}>
-                  <Search className="h-5 w-5 text-white/70" />
+                <div className="flex items-center gap-3 rounded-2xl border p-3 backdrop-blur-xl" style={{ background: THEME.cardBg, borderColor: 'rgba(0,0,0,0.15)' }}>
+                  <Search className="h-5 w-5 text-black/70" />
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="find venues in SF"
-                    className="flex-1 bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0"
+                    className="flex-1 bg-transparent border-0 text-black placeholder:text-black/60 focus-visible:ring-0"
                   />
-                  <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white/90">
+                  <Button size="sm" className="bg-black/15 hover:bg-black/25 text-black/90">
                     Search Venues
                   </Button>
-                  <Button size="sm" className="bg-emerald-400/20 hover:bg-emerald-400/30 text-emerald-100 border border-emerald-300/40">
+                  <Button size="sm" className="bg-emerald-400/20 hover:bg-emerald-400/30 text-emerald-800 border border-emerald-300/40">
                     <Sparkles className="h-4 w-4 mr-1" />
                     AI Recommender
                   </Button>
@@ -385,12 +385,12 @@ export const DeepBookingPage: React.FC = () => {
               <div className="flex items-center gap-3 ml-6">
                 <Button 
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-white/15 hover:bg-white/25 text-white"
+                  className="bg-black/15 hover:bg-black/25 text-black"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Task
                 </Button>
-                <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10">
+                <Button variant="ghost" size="sm" className="text-black/70 hover:text-black hover:bg-black/10">
                   <Settings className="h-4 w-4" />
                 </Button>
               </div>
@@ -412,8 +412,8 @@ export const DeepBookingPage: React.FC = () => {
                   <GlassCard key={stat.label} className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-white/70">{stat.label}</p>
-                        <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
+                        <p className="text-sm text-black/70">{stat.label}</p>
+                        <p className="text-2xl font-bold text-black mt-1">{stat.value}</p>
                       </div>
                       <div 
                         className="p-2 rounded-lg"
@@ -433,8 +433,8 @@ export const DeepBookingPage: React.FC = () => {
             {/* Venues grid */}
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Recommended Venues</h2>
-                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                <h2 className="text-2xl font-bold text-black">Recommended Venues</h2>
+                <Button variant="outline" className="border-black/20 text-black hover:bg-black/10">
                   View All
                 </Button>
               </div>
