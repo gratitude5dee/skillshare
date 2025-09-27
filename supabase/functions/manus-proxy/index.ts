@@ -35,7 +35,7 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             prompt,
-            mode: mode || 'fast',
+            mode: mode || 'speed',
             connectors: connectors || [],
             hide_in_task_list: hide_in_task_list || false,
             create_shareable_link: create_shareable_link || false,

@@ -116,7 +116,7 @@ export const AgentSelector: React.FC<AgentSelectorProps> = ({ agentId, onBack })
       // Create task with agent-specific prompt
       const prompt = generateAgentPrompt(agentId!, formData);
       const task = await ManusAPIService.createTask(prompt, {
-        mode: 'fast',
+        mode: 'speed',
         connectors: getAgentConnectors(agentId!)
       });
 

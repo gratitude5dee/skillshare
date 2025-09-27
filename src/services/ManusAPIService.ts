@@ -15,7 +15,7 @@ export interface ManusTask {
 }
 
 export interface ManusTaskOptions {
-  mode?: 'fast' | 'speed';
+  mode?: 'speed' | 'quality';
   connectors?: string[];
   hide_in_task_list?: boolean;
   create_shareable_link?: boolean;
@@ -47,7 +47,7 @@ class ManusAPIServiceClass {
 
   async createTask(prompt: string, options: ManusTaskOptions = {}): Promise<ManusTask> {
     const defaultOptions: Required<ManusTaskOptions> = {
-      mode: 'fast',
+      mode: 'speed',
       connectors: [],
       hide_in_task_list: false,
       create_shareable_link: false,
