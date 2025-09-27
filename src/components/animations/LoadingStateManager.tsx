@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CinematicIntroSequence } from './CinematicIntroSequence';
+import { IntroSequence } from './IntroSequence';
 
 interface LoadingStateManagerProps {
   children: React.ReactNode;
@@ -49,7 +49,7 @@ export const LoadingStateManager: React.FC<LoadingStateManagerProps> = ({
   if (!hasSeenIntro || !skipIntroOnRepeat) {
     console.log('LoadingStateManager: Showing intro sequence');
     return (
-      <CinematicIntroSequence 
+      <IntroSequence 
         onComplete={handleIntroComplete}
         canSkip={true}
       />
