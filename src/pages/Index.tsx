@@ -13,6 +13,13 @@ const Index: React.FC = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
+  // All hooks must be called at the top level
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
+
   // Show loading state
   if (loading) {
     return (
@@ -21,13 +28,6 @@ const Index: React.FC = () => {
       </div>
     );
   }
-
-  // Redirect to dashboard for authenticated users
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, navigate]);
 
   if (user) {
     return (
