@@ -1,6 +1,7 @@
 
 import React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import ConnectWalletButton from "./ConnectWalletButton";
 
 export const Navbar: React.FC = () => {
   const isMobile = useIsMobile();
@@ -18,6 +19,9 @@ export const Navbar: React.FC = () => {
             alt="WZRD.work Logo"
           />
         </div>
+      </div>
+      <div className="flex items-center">
+        <ConnectWalletButton />
       </div>
     </div>
   );
