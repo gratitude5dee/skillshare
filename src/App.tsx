@@ -14,6 +14,7 @@ import AgentsPage from "./pages/AgentsPage";
 import ChatPage from "./pages/ChatPage";
 import TasksPage from "./pages/TasksPage";
 import SettingsPage from "./pages/SettingsPage";
+import { DeepBookingPage } from "./pages/DeepBookingPage";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/booky" element={<DeepBookingPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
