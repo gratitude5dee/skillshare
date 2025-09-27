@@ -149,11 +149,11 @@ const QuickAction: React.FC<{ title: string; subtitle: string; onClick: () => vo
 );
 
 function recommendedConnectors(agentType: string, title: string) {
-  const base = ["supabase"] as string[];
-  if (agentType === "Connect") base.push("gmail");
-  if (agentType === "Research") base.push("firecrawl", "cloudflare");
-  if (title.toLowerCase().includes("video") || title.toLowerCase().includes("youtube")) base.push("invideo", "minimax");
-  if (title.toLowerCase().includes("partnership") || title.toLowerCase().includes("sponsor")) base.push("stripe");
+  const base = ["Supabase"] as string[];
+  if (agentType === "Connect") base.push("Gmail");
+  if (agentType === "Research") base.push("Firecrawl");
+  if (title.toLowerCase().includes("video") || title.toLowerCase().includes("youtube")) base.push("Minimax");
+  if (title.toLowerCase().includes("partnership") || title.toLowerCase().includes("sponsor")) base.push("Stripe");
   return Array.from(new Set(base));
 }
 
