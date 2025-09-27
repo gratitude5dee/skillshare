@@ -25,13 +25,16 @@ export const Dashboard: React.FC = () => {
         />
         
         <main className="flex-1 flex flex-col">
-          {chatMode === 'natural' ? (
-            <ChatInterface />
-          ) : (
+          {chatMode === 'agent' && selectedAgent ? (
             <AgentSelector 
               agentId={selectedAgent}
-              onBack={() => setChatMode('natural')}
+              onBack={() => {
+                setSelectedAgent(null);
+                setChatMode('natural');
+              }}
             />
+          ) : (
+            <ChatInterface />
           )}
         </main>
       </div>
