@@ -73,7 +73,14 @@ class ManusAPIServiceClass {
       });
 
       if (error) {
+        console.error('Supabase function error:', error);
         throw new Error(error.message || 'Failed to create Manus task');
+      }
+
+      // Check if the response contains an error from the edge function
+      if (data && data.error) {
+        console.error('Manus API error from edge function:', data);
+        throw new Error(`Manus API Error: ${data.error}${data.details ? ` - ${data.details}` : ''}`);
       }
 
       return data;

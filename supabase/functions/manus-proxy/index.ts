@@ -42,7 +42,22 @@ serve(async (req) => {
       case 'create-task': {
         const { prompt, mode, connectors, hide_in_task_list, create_shareable_link, attachments } = body;
         
+        // Enhanced logging
+        console.log('Received create-task request body:', JSON.stringify(body, null, 2));
         console.log('Creating Manus task with prompt:', prompt);
+        console.log('API Key available:', !!manusApiKey);
+        
+        // Construct the request payload for Manus API
+        const requestPayload = {
+          prompt,
+          mode: mode || 'fast',  // Changed from 'speed' to 'fast' based on Manus docs
+          connectors: connectors || [],
+          hide_in_task_list: hide_in_task_list || false,
+          create_shareable_link: create_shareable_link || false,
+          attachments: attachments || []
+        };
+        
+        console.log('Sending to Manus API:', JSON.stringify(requestPayload, null, 2));
         
         const response = await fetch(manusApiUrl, {
           method: 'POST',
@@ -51,20 +66,32 @@ serve(async (req) => {
             'content-type': 'application/json',
             'API_KEY': manusApiKey
           },
-          body: JSON.stringify({
-            prompt,
-            mode: mode || 'speed',
-            connectors: connectors || [],
-            hide_in_task_list: hide_in_task_list || false,
-            create_shareable_link: create_shareable_link || false,
-            attachments: attachments || []
-          })
+          body: JSON.stringify(requestPayload)
         });
+
+        console.log('Manus API response status:', response.status, response.statusText);
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Manus API error:', response.status, response.statusText, errorText);
-          throw new Error(`Manus API error: ${response.status} ${response.statusText}`);
+          console.error('Manus API error details:', {
+            status: response.status,
+            statusText: response.statusText,
+            errorBody: errorText,
+            requestPayload: requestPayload
+          });
+          
+          // Return more specific error information
+          return new Response(JSON.stringify({ 
+            error: `Manus API error: ${response.status} ${response.statusText}`,
+            details: errorText,
+            debug: {
+              payload: requestPayload,
+              status: response.status
+            }
+          }), {
+            status: response.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
         }
 
         const data = await response.json();
