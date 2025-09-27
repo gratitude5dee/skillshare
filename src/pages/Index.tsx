@@ -1,16 +1,17 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/learning-companion/Navbar";
 import Hero from "../components/learning-companion/Hero";
 import Features from "../components/learning-companion/Features";
 import NoMoreStuck from "../components/learning-companion/NoMoreStuck";
 import StudySmarter from "../components/learning-companion/StudySmarter";
 import Footer from "../components/learning-companion/Footer";
-import Dashboard from "./Dashboard";
 
 const Index: React.FC = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
   // Show loading state
   if (loading) {
@@ -21,9 +22,19 @@ const Index: React.FC = () => {
     );
   }
 
-  // Show dashboard for authenticated users
+  // Redirect to dashboard for authenticated users
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
+
   if (user) {
-    return <Dashboard />;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Redirecting to dashboard...</div>
+      </div>
+    );
   }
 
   // Show landing page for unauthenticated users
