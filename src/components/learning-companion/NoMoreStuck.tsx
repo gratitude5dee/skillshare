@@ -7,22 +7,22 @@ export const NoMoreStuck: React.FC = () => {
         <div className="self-stretch flex min-w-60 flex-col items-stretch justify-center w-[551px] max-w-full my-auto">
           <div className="w-full text-black max-md:text-center">
             <h2 className="text-[45px] font-black leading-[0.9] tracking-[-0.9px] uppercase max-md:text-[40px]">
-              no more feeling stuck.
+              no more work roadblocks.
             </h2>
             <div className="text-[32px] font-light leading-[45px] mt-4 max-md:text-2xl max-md:leading-relaxed">
-              Meet the companion that's always there to get you unblocked,
-              focused, and ready for your finals.
+              Meet the AI assistant that's always there to get you unblocked,
+              focused, and ready for success.
             </div>
           </div>
         </div>
         <div className="self-stretch flex min-w-60 h-[538px] flex-col items-stretch justify-center w-[390px] max-w-full my-auto">
           <div className="justify-center shadow-[0px_8px_32px_0px_rgba(50,60,69,0.20)] bg-white flex min-h-[539px] w-full flex-col overflow-hidden rounded-2xl">
             <div className="self-stretch w-full bg-white max-w-full gap-4 text-lg text-[rgba(10,14,9,1)] font-semibold leading-[1.4] px-6 py-4 border-[rgba(242,242,242,1)] border-b max-md:px-5">
-              AI Learning Companion
+              WZRD.work AI Assistant
             </div>
             <div className="bg-white self-stretch w-full overflow-hidden flex-1 p-6 max-md:px-5">
               <div className="bg-[rgba(242,242,242,1)] w-full text-[15px] text-black font-normal leading-[1.4] px-4 py-3 rounded-[16px_4px_16px_16px]">
-                Help me with this question
+                Help me optimize this workflow
               </div>
               <div className="bg-white w-full overflow-hidden mt-6 pb-4">
                 <div className="flex w-8 items-center gap-2">
@@ -33,12 +33,12 @@ export const NoMoreStuck: React.FC = () => {
                   />
                 </div>
                 <div className="text-black text-[15px] font-light leading-[21px] mt-2">
-                  Sure! Let's break it down. <br />
-                  <br />I remember from a previous chat that you're interested
-                  in sci-fi movies. Think of the Industrial Revolution as a
-                  portal for the pre-industrial era into another dimension – one
-                  with global trade, mechanized warfare, consumer culture, and
-                  environmental consequences. Want more examples?
+                  Absolutely! Let me analyze your workflow. <br />
+                  <br />Based on your previous projects, I can see you work best 
+                  with structured approaches. I recommend implementing automated 
+                  task prioritization, batch processing for similar activities, 
+                  and setting up smart notifications. Would you like specific 
+                  recommendations for your current project?
                 </div>
               </div>
             </div>
@@ -46,7 +46,7 @@ export const NoMoreStuck: React.FC = () => {
               <div className="bg-white border flex w-full items-center justify-between pl-4 pr-2 py-1 rounded-3xl border-[rgba(217,217,217,1)] border-solid">
                 <input
                   type="text"
-                  placeholder="Ask follow-up questions..."
+                  placeholder="Ask follow-up questions about workflow..."
                   className="self-stretch flex-1 shrink basis-[0%] my-auto outline-none"
                 />
                 <div className="self-stretch flex min-h-10 my-auto py-2 rounded-[999px]" />

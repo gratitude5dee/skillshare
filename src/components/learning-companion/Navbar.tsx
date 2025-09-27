@@ -15,7 +15,7 @@ export const Navbar: React.FC = () => {
           <img
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/5649d9f7037e46bfb785405d17b2e6b707bf0d6d?placeholderIfAbsent=true"
             className="aspect-[2.22] object-contain w-full"
-            alt="Learning Companion Logo"
+            alt="WZRD.work Logo"
           />
         </div>
       </div>

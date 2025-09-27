@@ -7,19 +7,14 @@ export const Hero: React.FC = () => {
     <div className="self-center flex w-[1222px] max-w-full flex-col items-center pt-10 pb-20 px-4">
       <div className="flex w-full flex-col items-center text-center max-md:max-w-full">
         <div className="flex w-[800px] max-w-full flex-col items-center text-5xl text-[#0A0E09] font-black uppercase leading-none max-md:text-[40px]">
-          <div className="max-md:text-[40px]">THE Learning</div>
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/b48f585da1cc5d2cdb62417f245c0dd090434ab7?placeholderIfAbsent=true"
-            className="aspect-[5.41] object-contain w-full"
-            alt="Companion"
-          />
+          <div className="max-md:text-[40px]">WZRD.work</div>
+          <div className="text-2xl font-light normal-case mt-4 max-md:text-xl">powered by Manus AI</div>
         </div>
         <div className="mx-auto text-center w-full max-w-[532px] text-lg text-black font-light leading-[25px] mt-4">
-          Built for YOU. Instantly turn your notes and homework into Expert
-          answers, personalized worksheets, and stress-free Test Prep.
+          Built for YOU. AI-powered work assistance that transforms your productivity and streamlines your workflow.
         </div>
         <div className="mt-8 mb-12">
-          <CTAButton text="Get help studying" />
+          <CTAButton text="Get AI assistance" />
         </div>
       </div>
       <div className="relative flex min-h-[459px] w-full items-start gap-4 justify-center max-md:max-w-full">

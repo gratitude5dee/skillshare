@@ -6,11 +6,10 @@ export const StudySmarter: React.FC = () => {
     <div className="bg-[rgba(242,242,242,1)] flex w-full flex-col items-center pt-10 pb-20 px-4 max-md:max-w-full">
       <div className="flex w-[720px] max-w-full flex-col items-stretch text-[#0a0e09] text-center py-3">
         <h2 className="text-[45px] font-black leading-none self-center max-md:max-w-full max-md:text-[32px]">
-          HOW THEY'RE STUDYING SMARTER
+          HOW THEY'RE WORKING SMARTER
         </h2>
         <div className="w-full text-[32px] font-light leading-[45px] mt-2 max-md:max-w-full max-md:text-xl max-md:leading-normal">
-          Watch how Brainly is taking students from "what even is this?" to "I
-          got this."
+          Watch how WZRD.work is taking professionals from "this is overwhelming" to "I've got this handled."
         </div>
       </div>
       <div className="flex min-h-[566px] w-[1012px] max-w-full items-center gap-[40px] justify-center flex-wrap">
