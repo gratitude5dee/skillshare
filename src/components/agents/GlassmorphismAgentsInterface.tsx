@@ -103,7 +103,7 @@ const GlassPill: React.FC<{ active?: boolean; onClick?: () => void; children: Re
     className={classNames(
       "relative rounded-full px-4 py-2 text-sm font-medium transition",
       "backdrop-blur-xl border border-white/15",
-      active ? "bg-white/20 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]" : "bg-white/10 text-white/80 hover:bg-white/15"
+      active ? "bg-white/20 text-black shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]" : "bg-white/10 text-black/80 hover:bg-white/15"
     )}
   >
     {children}
@@ -130,16 +130,16 @@ const QuickAction: React.FC<{ title: string; subtitle: string; onClick: () => vo
   <GlassCard className="cursor-pointer bg-gradient-to-br from-white/15 to-white/5">
     <div className="flex items-start gap-4">
       <div className="rounded-2xl bg-white/20 p-3 backdrop-blur">
-        <Sparkles className="h-6 w-6 text-white" />
+        <Sparkles className="h-6 w-6 text-black" />
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <h4 className="text-white text-lg font-semibold">{title}</h4>
-          <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-xs text-emerald-300">Preset</span>
+          <h4 className="text-black text-lg font-semibold">{title}</h4>
+          <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-xs text-emerald-700">Preset</span>
         </div>
-        <p className="mt-1 text-sm text-white/80">{subtitle}</p>
+        <p className="mt-1 text-sm text-black/80">{subtitle}</p>
       </div>
-      <button onClick={onClick} className="rounded-full bg-white/20 p-2 text-white hover:bg-white/30">
+      <button onClick={onClick} className="rounded-full bg-white/20 p-2 text-black hover:bg-white/30">
         <Play className="h-5 w-5" />
       </button>
     </div>
@@ -160,22 +160,22 @@ const AgentCard = ({ agent, onOpen }: { agent: typeof AGENTS[number]; onOpen: ()
     <GlassCard>
       <div className="flex items-start gap-3">
         <div className="rounded-2xl bg-white/20 p-2.5">
-          <Wand2 className="h-5 w-5 text-white" />
+          <Wand2 className="h-5 w-5 text-black" />
         </div>
         <div className="flex-1">
           <div className="mb-1 flex items-center gap-2">
-            <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-white/80">{agent.type}</span>
+            <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-black/80">{agent.type}</span>
           </div>
-          <h3 className="text-white text-lg font-semibold leading-tight">{agent.title}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-white/80">{agent.subtitle}</p>
+          <h3 className="text-black text-lg font-semibold leading-tight">{agent.title}</h3>
+          <p className="mt-1 line-clamp-2 text-sm text-black/80">{agent.subtitle}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {recommendedConnectors(agent.type, agent.title).map((c) => (
-              <span key={c} className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] text-white/80">{CONNECTORS.find(x=>x.id===c)?.label ?? c}</span>
+              <span key={c} className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] text-black/80">{CONNECTORS.find(x=>x.id===c)?.label ?? c}</span>
             ))}
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <button onClick={onOpen} className="rounded-full bg-white/20 p-2 text-white hover:bg-white/30">
+          <button onClick={onOpen} className="rounded-full bg-white/20 p-2 text-black hover:bg-white/30">
             <Info className="h-5 w-5" />
           </button>
           <button onClick={onOpen} className="rounded-full bg-emerald-400/90 p-2 text-emerald-950 hover:bg-emerald-300">
@@ -191,7 +191,7 @@ const ToastHost: React.FC<{ toasts: { id: number; text: string }[]; onClose: (id
   <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
     <AnimatePresence>
       {toasts.map((t) => (
-        <motion.div key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/20 px-4 py-3 text-white backdrop-blur-xl shadow-lg">
+        <motion.div key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/20 px-4 py-3 text-black backdrop-blur-xl shadow-lg">
           <Check className="h-5 w-5 text-emerald-300" />
           <span className="text-sm">{t.text}</span>
           <button onClick={() => onClose(t.id)} className="ml-2 rounded-full bg-white/20 p-1 hover:bg-white/30">
@@ -238,14 +238,14 @@ const AgentModal: React.FC<{
       {open && agent ? (
         <motion.div className="fixed inset-0 z-50 grid place-items-center p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-          <motion.div layout initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ type: "spring", stiffness: 220, damping: 22 }} className="relative w-full max-w-3xl rounded-3xl border border-white/15 bg-white/10 p-6 text-white backdrop-blur-2xl shadow-2xl">
+          <motion.div layout initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ type: "spring", stiffness: 220, damping: 22 }} className="relative w-full max-w-3xl rounded-3xl border border-white/15 bg-white/10 p-6 text-black backdrop-blur-2xl shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="mb-2 flex items-center gap-2">
-                  <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-white/80">{agent.type}</span>
+                  <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-black/80">{agent.type}</span>
                 </div>
                 <h2 className="text-2xl font-semibold">{agent.title}</h2>
-                <p className="mt-1 max-w-3xl text-white/85">{agent.subtitle}</p>
+                <p className="mt-1 max-w-3xl text-black/85">{agent.subtitle}</p>
               </div>
               <button onClick={onClose} className="rounded-full bg-white/15 p-2 hover:bg-white/25">
                 <X className="h-5 w-5" />
@@ -254,43 +254,43 @@ const AgentModal: React.FC<{
 
             <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
               <div className="col-span-1">
-                <label className="mb-2 block text-sm text-white/80">Task Type</label>
+                <label className="mb-2 block text-sm text-black/80">Task Type</label>
                 <div className="relative">
-                  <select value={taskType} onChange={(e) => setTaskType(e.target.value)} className="w-full appearance-none rounded-2xl border border-white/20 bg-white/10 px-4 py-3 pr-10 text-white backdrop-blur">
+                  <select value={taskType} onChange={(e) => setTaskType(e.target.value)} className="w-full appearance-none rounded-2xl border border-white/20 bg-white/10 px-4 py-3 pr-10 text-black backdrop-blur">
                     {TASK_TYPES.map((t) => (
                       <option key={t} className="bg-slate-900" value={t}>{t}</option>
                     ))}
                   </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/70" />
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/70" />
                 </div>
               </div>
 
               <div className="col-span-2">
-                <label className="mb-2 block text-sm text-white/80">Connectors</label>
+                <label className="mb-2 block text-sm text-black/80">Connectors</label>
                 <div className="flex flex-wrap gap-2">
                   {CONNECTORS.map((c) => (
-                    <button key={c.id} onClick={() => toggleConn(c.id)} className={classNames("rounded-full border px-3 py-1.5 text-sm backdrop-blur transition", connectors.includes(c.id) ? "border-emerald-300/50 bg-emerald-400/20 text-emerald-100" : "border-white/20 bg-white/10 text-white/80 hover:bg-white/15")}>{c.label}</button>
+                    <button key={c.id} onClick={() => toggleConn(c.id)} className={classNames("rounded-full border px-3 py-1.5 text-sm backdrop-blur transition", connectors.includes(c.id) ? "border-emerald-300/50 bg-emerald-400/20 text-emerald-700" : "border-white/20 bg-white/10 text-black/80 hover:bg-white/15")}>{c.label}</button>
                   ))}
                 </div>
               </div>
 
               <div className="col-span-1">
-                <label className="mb-2 block text-sm text-white/80">Schedule</label>
+                <label className="mb-2 block text-sm text-black/80">Schedule</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(["One-off", "Daily", "Weekly", "Monthly"] as const).map((s) => (
-                    <button key={s} onClick={() => setSchedule(s)} className={classNames("rounded-xl border px-3 py-2 text-sm", schedule === s ? "border-emerald-300/60 bg-emerald-400/20" : "border-white/20 bg-white/10 hover:bg-white/15")}>{s}</button>
+                    <button key={s} onClick={() => setSchedule(s)} className={classNames("rounded-xl border px-3 py-2 text-sm text-black", schedule === s ? "border-emerald-300/60 bg-emerald-400/20" : "border-white/20 bg-white/10 hover:bg-white/15")}>{s}</button>
                   ))}
                 </div>
               </div>
 
               <div className="col-span-2">
-                <label className="mb-2 block text-sm text-white/80">Notes / Instructions</label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any constraints, data sources, cities, budgets, etc." className="h-28 w-full resize-none rounded-2xl border border-white/20 bg-white/10 p-3 text-white backdrop-blur placeholder:text-white/50" />
+                <label className="mb-2 block text-sm text-black/80">Notes / Instructions</label>
+                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any constraints, data sources, cities, budgets, etc." className="h-28 w-full resize-none rounded-2xl border border-white/20 bg-white/10 p-3 text-black backdrop-blur placeholder:text-black/50" />
               </div>
             </div>
 
             <div className="mt-6 flex items-center justify-between">
-              <div className="flex items-center gap-3 text-white/80">
+              <div className="flex items-center gap-3 text-black/80">
                 <Settings2 className="h-4 w-4" />
                 <span className="text-sm">This will create a Manus task with the selected connectors.</span>
               </div>
@@ -308,9 +308,9 @@ const AgentModal: React.FC<{
 const TopSearch: React.FC<{ value: string; onChange: (v: string) => void }> = ({ value, onChange }) => (
   <div className="mx-auto mt-10 max-w-5xl">
     <div className="mx-auto flex w-full items-center gap-3 rounded-3xl border border-white/15 bg-white/10 p-3 backdrop-blur-xl">
-      <Search className="mx-2 h-5 w-5 text-white/80" />
-      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="Search agents, e.g. 'venues', 'brand', 'YouTube'" className="flex-1 bg-transparent text-white placeholder:text-white/60 focus:outline-none" />
-      <button className="rounded-full bg-white/15 px-3 py-2 text-xs font-semibold text-white/90 hover:bg-white/25">
+      <Search className="mx-2 h-5 w-5 text-black/80" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="Search agents, e.g. 'venues', 'brand', 'YouTube'" className="flex-1 bg-transparent text-black placeholder:text-black/60 focus:outline-none" />
+      <button className="rounded-full bg-white/15 px-3 py-2 text-xs font-semibold text-black/90 hover:bg-white/25">
         <span className="inline-flex items-center gap-2"><Sparkles className="h-4 w-4" /> AI Recommender</span>
       </button>
     </div>
@@ -324,7 +324,7 @@ const SegmentedFilters: React.FC<{ active: typeof AGENT_TYPES[number]; setActive
         <GlassPill key={t} active={active === t} onClick={() => setActive(t)}>{t}</GlassPill>
       ))}
     </div>
-    <div className="flex items-center gap-2 text-white/80">
+    <div className="flex items-center gap-2 text-black/80">
       <SlidersHorizontal className="h-4 w-4" />
       <span className="text-sm">Glass view</span>
     </div>
@@ -332,7 +332,7 @@ const SegmentedFilters: React.FC<{ active: typeof AGENT_TYPES[number]; setActive
 );
 
 const EmptyState: React.FC = () => (
-  <div className="mx-auto mt-16 max-w-md text-center text-white/80">
+  <div className="mx-auto mt-16 max-w-md text-center text-black/80">
     <LayoutGrid className="mx-auto h-10 w-10" />
     <p className="mt-3">No agents match your filters. Try a different search or type.</p>
   </div>
@@ -397,23 +397,23 @@ ${payload.agent.subtitle}`;
   };
 
   return (
-    <div className="relative min-h-screen bg-slate-950">
+    <div className="relative min-h-screen bg-white">
       <GradientBackground />
 
       {/* Header */}
-      <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 pt-8 text-white">
+      <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 pt-8 text-black">
         <div className="flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/15 backdrop-blur"><Sparkles className="h-5 w-5" /></div>
           <div>
             <h1 className="text-2xl font-bold">Agents Studio</h1>
-            <p className="text-sm text-white/70">Glassmorphism dashboard for Manus agents</p>
+            <p className="text-sm text-black/70">Glassmorphism dashboard for Manus agents</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-sm hover:bg-white/20">
+          <button className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-sm hover:bg-white/20 text-black">
             <span className="inline-flex items-center gap-2"><Search className="h-4 w-4" /> Search Venues</span>
           </button>
-          <button className="rounded-2xl border border-emerald-300/40 bg-emerald-400/20 px-4 py-2 text-sm text-emerald-100 hover:bg-emerald-400/30">
+          <button className="rounded-2xl border border-emerald-300/40 bg-emerald-400/20 px-4 py-2 text-sm text-emerald-700 hover:bg-emerald-400/30">
             <span className="inline-flex items-center gap-2"><Sparkles className="h-4 w-4" /> AI Recommender</span>
           </button>
         </div>
@@ -446,7 +446,7 @@ ${payload.agent.subtitle}`;
       <ToastHost toasts={toast.toasts} onClose={toast.remove} />
 
       {/* Footer */}
-      <footer className="pointer-events-none fixed inset-x-0 bottom-0 z-0 h-32 bg-gradient-to-t from-slate-950 to-transparent" />
+      <footer className="pointer-events-none fixed inset-x-0 bottom-0 z-0 h-32 bg-gradient-to-t from-white to-transparent" />
     </div>
   );
 }
