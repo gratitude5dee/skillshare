@@ -149,11 +149,12 @@ const QuickAction: React.FC<{ title: string; subtitle: string; onClick: () => vo
 );
 
 function recommendedConnectors(agentType: string, title: string) {
-  const base = ["Supabase"] as string[];
+  const base = ["Firecrawl"] as string[]; // Use valid Manus API connectors
   if (agentType === "Connect") base.push("Gmail");
-  if (agentType === "Research") base.push("Firecrawl");
+  if (agentType === "Research") base.push("HuggingFace");
   if (title.toLowerCase().includes("video") || title.toLowerCase().includes("youtube")) base.push("Minimax");
   if (title.toLowerCase().includes("partnership") || title.toLowerCase().includes("sponsor")) base.push("Stripe");
+  if (title.toLowerCase().includes("calendar") || title.toLowerCase().includes("schedule")) base.push("Google Calendar");
   return Array.from(new Set(base));
 }
 

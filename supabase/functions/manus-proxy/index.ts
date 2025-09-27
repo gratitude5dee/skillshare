@@ -33,12 +33,21 @@ serve(async (req) => {
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
       try {
-        const { data: { user }, error } = await supabase.auth.getUser(token);
+        // Use getSession instead of getUser for better token handling
+        const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Error getting user from token:', error);
-        } else {
-          userId = user?.id;
-          console.log('Authenticated user ID:', userId);
+          console.error('Error getting session:', error);
+          // Fallback to getUser with token
+          const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+          if (userError) {
+            console.error('Error getting user from token:', userError);
+          } else {
+            userId = user?.id;
+            console.log('Authenticated user ID from fallback:', userId);
+          }
+        } else if (session?.user) {
+          userId = session.user.id;
+          console.log('Authenticated user ID from session:', userId);
         }
       } catch (error) {
         console.error('Exception getting user from token:', error);
