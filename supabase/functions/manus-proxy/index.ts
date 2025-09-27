@@ -32,8 +32,19 @@ serve(async (req) => {
     
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
-      userId = user?.id;
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (error) {
+          console.error('Error getting user from token:', error);
+        } else {
+          userId = user?.id;
+          console.log('Authenticated user ID:', userId);
+        }
+      } catch (error) {
+        console.error('Exception getting user from token:', error);
+      }
+    } else {
+      console.log('No authorization header provided');
     }
 
     const manusApiUrl = 'https://api.manus.ai/v1/tasks';
