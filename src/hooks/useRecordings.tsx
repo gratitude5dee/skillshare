@@ -77,6 +77,7 @@ export function useRecordings() {
       const { data: recording, error: dbError } = await supabase
         .from('screen_recordings')
         .insert([{
+          user_id: (await supabase.auth.getUser()).data.user?.id,
           title: metadata.title,
           description: metadata.description,
           file_url: urlData.publicUrl,
