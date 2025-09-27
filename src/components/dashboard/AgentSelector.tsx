@@ -290,9 +290,9 @@ function generateAgentPrompt(agentId: string, data: Record<string, any>): string
 
 function getAgentConnectors(agentId: string): string[] {
   const connectors = {
-    'viral-content': ['Firecrawl'],
-    'corporate-partnerships': ['Polygon', 'Firecrawl'],
-    'brand-audit': ['Firecrawl', 'HuggingFace']
+    'viral-content': [],
+    'corporate-partnerships': [],
+    'brand-audit': []
   };
 
   return connectors[agentId as keyof typeof connectors] || [];
