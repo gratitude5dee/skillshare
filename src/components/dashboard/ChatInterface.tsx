@@ -97,13 +97,7 @@ export const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border p-4">
-        <h2 className="text-xl font-semibold text-foreground">AI Assistant</h2>
-        <p className="text-sm text-muted-foreground">Powered by Manus AI - Natural language task processing</p>
-      </div>
-
+    <div className="flex flex-col h-full bg-background border border-border rounded-lg overflow-hidden">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
