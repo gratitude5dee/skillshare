@@ -41,18 +41,6 @@ const navigationItems = [
     description: 'Overview and analytics'
   },
   {
-    title: 'Short-Form Factory',
-    url: '/short-form-factory',
-    icon: Video,
-    description: 'Turn tracks into viral content'
-  },
-  {
-    title: 'Booky',
-    url: '/booky',
-    icon: Sparkles,
-    description: 'DeepBooking Platform'
-  },
-  {
     title: 'Automation',
     url: '/automation',
     icon: Cpu,
@@ -68,7 +56,7 @@ const navigationItems = [
     title: 'AI Agents',
     url: '/agents',
     icon: Bot,
-    description: 'Agent library'
+    description: 'All AI tools & agents'
   },
   {
     title: 'AI Chat',

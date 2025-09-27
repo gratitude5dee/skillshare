@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sparkles, Filter, X, Play, Info, Wand2, Clock, Check, ChevronDown, Send, Settings2, PlusSquare, Calendar, Link as LinkIcon, Loader2, ExternalLink, LayoutGrid, SlidersHorizontal } from "lucide-react";
+import { Search, Sparkles, Filter, X, Play, Info, Wand2, Clock, Check, ChevronDown, Send, Settings2, PlusSquare, Calendar, Link as LinkIcon, Loader2, ExternalLink, LayoutGrid, SlidersHorizontal, Video } from "lucide-react";
 import { ManusAPIService } from '@/services/ManusAPIService';
 import { useToast } from '@/hooks/use-toast';
+import { ShortFormFactoryAgent } from './ShortFormFactoryAgent';
+import { BookyAgent } from './BookyAgent';
 
 const AGENT_TYPES = ["All", "Create", "Connect", "Report", "Plan", "Research"] as const;
 
@@ -30,6 +32,7 @@ const CONNECTORS = [
 /** Agents catalog: type, title, subtitle/description */
 const AGENTS = [
   // Create
+  { type: "Create", title: "Short Form Factory", subtitle: "Turn any Spotify track or YouTube video into viral short-form content with beat-synced videos and trending angles.", component: "short-form-factory" },
   { type: "Create", title: "5 Viral Content Ideas", subtitle: "Analyzes current viral trends and gives you 5 authentic content ideas with high viral potential and platform strategies." },
   { type: "Create", title: "Corporate Partnership Finder", subtitle: "Analyzes your audience to find perfect brand partnership opportunities ranked by revenue potential." },
   { type: "Create", title: "Image to Style Extractor", subtitle: "Turn image(s) into a style guide prompt." },
@@ -52,6 +55,7 @@ const AGENTS = [
   { type: "Report", title: "YouTube Revenue Report", subtitle: "Gets your actual YouTube revenue data and video performance metrics in an easy-to-read report." },
 
   // Plan
+  { type: "Plan", title: "Booky (Venue Booking)", subtitle: "DeepBooking platform for finding and securing venue bookings with AI-powered venue matching and booking automation.", component: "booky" },
   { type: "Plan", title: "Brand Redesign with Visual Mockups", subtitle: "Analyzes your current brand perception and creates visual mockups of your refreshed identity with implementation steps." },
   { type: "Plan", title: "Content Calendar Creator", subtitle: "Develops strategic monthly content calendar across all platforms with posting schedule and trending topics." },
   { type: "Plan", title: "Find New Fans Visual Map", subtitle: "Identifies untapped audience segments and creates visual map showing where to find and acquire new listeners." },
@@ -153,37 +157,50 @@ function recommendedConnectors(agentType: string, title: string) {
   return Array.from(new Set(base));
 }
 
-const AgentCard = ({ agent, onOpen }: { agent: typeof AGENTS[number]; onOpen: () => void }) => (
-  <motion.div layout whileHover={{ y: -3 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-    <GlassCard>
-      <div className="flex items-start gap-3">
-        <div className="rounded-2xl bg-white/20 p-2.5">
-          <Wand2 className="h-5 w-5 text-black" />
-        </div>
-        <div className="flex-1">
-          <div className="mb-1 flex items-center gap-2">
-            <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-black/80">{agent.type}</span>
+const AgentCard = ({ agent, onOpen }: { agent: typeof AGENTS[number]; onOpen: () => void }) => {
+  const getAgentIcon = (title: string) => {
+    if (title.includes('Short Form Factory')) return Video;
+    if (title.includes('Booky')) return Sparkles;
+    return Wand2;
+  };
+
+  const AgentIcon = getAgentIcon(agent.title);
+
+  return (
+    <motion.div layout whileHover={{ y: -3 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+      <GlassCard>
+        <div className="flex items-start gap-3">
+          <div className="rounded-2xl bg-white/20 p-2.5">
+            <AgentIcon className="h-5 w-5 text-black" />
           </div>
-          <h3 className="text-black text-lg font-semibold leading-tight">{agent.title}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-black/80">{agent.subtitle}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {recommendedConnectors(agent.type, agent.title).map((c) => (
-              <span key={c} className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] text-black/80">{CONNECTORS.find(x=>x.id===c)?.label ?? c}</span>
-            ))}
+          <div className="flex-1">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[11px] uppercase tracking-wide text-black/80">{agent.type}</span>
+              {(agent as any).component && (
+                <span className="rounded-full border border-emerald-300/40 bg-emerald-400/20 px-2 py-0.5 text-[11px] uppercase tracking-wide text-emerald-700">App</span>
+              )}
+            </div>
+            <h3 className="text-black text-lg font-semibold leading-tight">{agent.title}</h3>
+            <p className="mt-1 line-clamp-2 text-sm text-black/80">{agent.subtitle}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {recommendedConnectors(agent.type, agent.title).map((c) => (
+                <span key={c} className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] text-black/80">{CONNECTORS.find(x=>x.id===c)?.label ?? c}</span>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <button onClick={onOpen} className="rounded-full bg-white/20 p-2 text-black hover:bg-white/30">
+              <Info className="h-5 w-5" />
+            </button>
+            <button onClick={onOpen} className="rounded-full bg-emerald-400/90 p-2 text-emerald-950 hover:bg-emerald-300">
+              <Play className="h-5 w-5" />
+            </button>
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <button onClick={onOpen} className="rounded-full bg-white/20 p-2 text-black hover:bg-white/30">
-            <Info className="h-5 w-5" />
-          </button>
-          <button onClick={onOpen} className="rounded-full bg-emerald-400/90 p-2 text-emerald-950 hover:bg-emerald-300">
-            <Play className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-    </GlassCard>
-  </motion.div>
-);
+      </GlassCard>
+    </motion.div>
+  );
+};
 
 const ToastHost: React.FC<{ toasts: { id: number; text: string }[]; onClose: (id: number) => void }> = ({ toasts, onClose }) => (
   <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
@@ -349,6 +366,7 @@ export default function GlassmorphismAgentsInterface() {
   const [active, setActive] = useState<typeof AGENT_TYPES[number]>("All");
   const [selected, setSelected] = useState<typeof AGENTS[number] | null>(null);
   const [open, setOpen] = useState(false);
+  const [activeComponent, setActiveComponent] = useState<string | null>(null);
   const toast = useToastState();
   const { toast: systemToast } = useToast();
 
@@ -390,9 +408,45 @@ ${payload.agent.subtitle}`;
   };
 
   const openAgent = (agent: typeof AGENTS[number]) => {
-    setSelected(agent);
-    setOpen(true);
+    // Check if this agent has a custom component
+    if ((agent as any).component) {
+      setActiveComponent((agent as any).component);
+    } else {
+      setSelected(agent);
+      setOpen(true);
+    }
   };
+
+  const handleBackToAgents = () => {
+    setActiveComponent(null);
+    setSelected(null);
+    setOpen(false);
+  };
+
+  // Render specific agent component if selected
+  if (activeComponent === 'short-form-factory') {
+    return (
+      <div className="relative min-h-screen bg-white">
+        <GradientBackground />
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <ShortFormFactoryAgent onBack={handleBackToAgents} />
+        </div>
+        <ToastHost toasts={toast.toasts} onClose={toast.remove} />
+      </div>
+    );
+  }
+
+  if (activeComponent === 'booky') {
+    return (
+      <div className="relative min-h-screen bg-white">
+        <GradientBackground />
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <BookyAgent onBack={handleBackToAgents} />
+        </div>
+        <ToastHost toasts={toast.toasts} onClose={toast.remove} />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-white">
@@ -442,9 +496,6 @@ ${payload.agent.subtitle}`;
 
       <AgentModal open={open} onClose={() => setOpen(false)} agent={selected} onCreateTask={onCreateTask} />
       <ToastHost toasts={toast.toasts} onClose={toast.remove} />
-
-      {/* Footer */}
-      <footer className="pointer-events-none fixed inset-x-0 bottom-0 z-0 h-32 bg-gradient-to-t from-white to-transparent" />
     </div>
   );
 }
