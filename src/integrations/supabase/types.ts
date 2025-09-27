@@ -1183,6 +1183,51 @@ export type Database = {
           },
         ]
       }
+      manus_tasks: {
+        Row: {
+          completed_at: string | null
+          connectors: Json | null
+          created_at: string
+          error_message: string | null
+          id: string
+          manus_task_id: string
+          metadata: Json | null
+          mode: string
+          prompt: string
+          result: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          connectors?: Json | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          manus_task_id: string
+          metadata?: Json | null
+          mode?: string
+          prompt: string
+          result?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          connectors?: Json | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          manus_task_id?: string
+          metadata?: Json | null
+          mode?: string
+          prompt?: string
+          result?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           asset_type: string

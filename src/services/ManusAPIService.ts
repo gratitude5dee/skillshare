@@ -57,8 +57,14 @@ class ManusAPIServiceClass {
     const taskOptions = { ...defaultOptions, ...options };
 
     try {
+      // Get current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      
       // Use Supabase edge function as proxy to avoid CORS issues
       const { data, error } = await supabase.functions.invoke('manus-proxy', {
+        headers: {
+          authorization: `Bearer ${session?.access_token}`
+        },
         body: {
           action: 'create-task',
           prompt,
@@ -79,7 +85,13 @@ class ManusAPIServiceClass {
 
   async getTask(taskId: string): Promise<ManusTask> {
     try {
+      // Get current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase.functions.invoke('manus-proxy', {
+        headers: {
+          authorization: `Bearer ${session?.access_token}`
+        },
         body: {
           action: 'get-task',
           taskId
@@ -99,7 +111,13 @@ class ManusAPIServiceClass {
 
   async listTasks(limit = 10): Promise<ManusTask[]> {
     try {
+      // Get current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase.functions.invoke('manus-proxy', {
+        headers: {
+          authorization: `Bearer ${session?.access_token}`
+        },
         body: {
           action: 'list-tasks',
           limit
