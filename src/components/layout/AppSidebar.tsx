@@ -8,7 +8,8 @@ import {
   Settings,
   ChevronRight,
   Sparkles,
-  Video
+  Video,
+  Menu
 } from 'lucide-react';
 import {
   Sidebar,
@@ -20,6 +21,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import manusLogo from '@/assets/manus-logo.png';
@@ -79,14 +81,19 @@ export function AppSidebar() {
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarHeader className="border-b border-border">
-        <div className="flex items-center gap-3 px-3 py-4">
-          <img src={manusLogo} alt="Manus" className="h-8 w-auto" />
-          {!collapsed && (
-            <div>
-              <h1 className="text-lg font-bold text-foreground">WZRD.work</h1>
-              <p className="text-xs text-muted-foreground">powered by Manus AI</p>
-            </div>
-          )}
+        <div className="flex items-center justify-between px-3 py-4">
+          <div className="flex items-center gap-3">
+            <img src={manusLogo} alt="Manus" className="h-8 w-auto" />
+            {!collapsed && (
+              <div>
+                <h1 className="text-lg font-bold text-foreground">WZRD.work</h1>
+                <p className="text-xs text-muted-foreground">powered by Manus AI</p>
+              </div>
+            )}
+          </div>
+          <SidebarTrigger className="p-2 hover:bg-muted rounded-md">
+            <Menu className="h-4 w-4" />
+          </SidebarTrigger>
         </div>
       </SidebarHeader>
 
