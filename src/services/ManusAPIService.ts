@@ -15,7 +15,7 @@ export interface ManusTask {
 }
 
 export interface ManusTaskOptions {
-  mode?: 'speed' | 'quality' | 'fast';
+  mode?: 'speed' | 'quality';
   connectors?: string[];
   hide_in_task_list?: boolean;
   create_shareable_link?: boolean;

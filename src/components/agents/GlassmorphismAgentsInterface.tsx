@@ -368,7 +368,7 @@ Notes: ${payload.notes}
 ${payload.agent.subtitle}`;
 
       const task = await ManusAPIService.createTask(prompt, {
-        mode: 'fast',
+        mode: 'speed',
         connectors: payload.connectors
       });
 
