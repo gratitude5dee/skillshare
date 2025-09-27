@@ -15,7 +15,9 @@ const Index: React.FC = () => {
 
   // All hooks must be called at the top level
   useEffect(() => {
+    console.log('Index: user state changed:', user ? 'logged in' : 'not logged in');
     if (user) {
+      console.log('Index: Redirecting to dashboard');
       navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
