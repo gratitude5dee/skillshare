@@ -17,6 +17,8 @@ import TasksPage from "./pages/TasksPage";
 import SettingsPage from "./pages/SettingsPage";
 import { DeepBookingPage } from "./pages/DeepBookingPage";
 import { ShortFormFactoryPage } from "./pages/ShortFormFactoryPage";
+import { AutomationPage } from "./pages/AutomationPage";
+import { RecordingsPage } from "./pages/RecordingsPage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,8 @@ const App = () => (
                 <Route path="/tasks" element={<TasksPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/booky" element={<DeepBookingPage />} />
+                <Route path="/automation" element={<AutomationPage />} />
+                <Route path="/recordings" element={<RecordingsPage />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

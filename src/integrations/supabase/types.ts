@@ -192,6 +192,54 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_analytics: {
+        Row: {
+          action_id: string | null
+          context: Json | null
+          created_at: string | null
+          execution_log_id: string | null
+          id: string
+          metric_type: string
+          metric_value: number | null
+          user_id: string
+        }
+        Insert: {
+          action_id?: string | null
+          context?: Json | null
+          created_at?: string | null
+          execution_log_id?: string | null
+          id?: string
+          metric_type: string
+          metric_value?: number | null
+          user_id: string
+        }
+        Update: {
+          action_id?: string | null
+          context?: Json | null
+          created_at?: string | null
+          execution_log_id?: string | null
+          id?: string
+          metric_type?: string
+          metric_value?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_analytics_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_analytics_execution_log_id_fkey"
+            columns: ["execution_log_id"]
+            isOneToOne: false
+            referencedRelation: "execution_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       board_collaborators: {
         Row: {
           board_id: string
@@ -856,6 +904,65 @@ export type Database = {
             columns: ["workflow_id"]
             isOneToOne: false
             referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      execution_logs: {
+        Row: {
+          action_id: string
+          checkpoints_cancelled: number | null
+          checkpoints_modified: number | null
+          checkpoints_shown: number | null
+          created_at: string | null
+          duration_seconds: number | null
+          end_time: string | null
+          error_message: string | null
+          execution_data: Json | null
+          id: string
+          screenshot_url: string | null
+          start_time: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          action_id: string
+          checkpoints_cancelled?: number | null
+          checkpoints_modified?: number | null
+          checkpoints_shown?: number | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          end_time?: string | null
+          error_message?: string | null
+          execution_data?: Json | null
+          id?: string
+          screenshot_url?: string | null
+          start_time?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          action_id?: string
+          checkpoints_cancelled?: number | null
+          checkpoints_modified?: number | null
+          checkpoints_shown?: number | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          end_time?: string | null
+          error_message?: string | null
+          execution_data?: Json | null
+          id?: string
+          screenshot_url?: string | null
+          start_time?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_logs_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_actions"
             referencedColumns: ["id"]
           },
         ]
@@ -2016,6 +2123,48 @@ export type Database = {
           },
         ]
       }
+      screen_recordings: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          raw_data: Json | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          raw_data?: Json | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          raw_data?: Json | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       security_audit_log: {
         Row: {
           created_at: string
@@ -2539,6 +2688,42 @@ export type Database = {
           },
         ]
       }
+      user_automation_preferences: {
+        Row: {
+          auto_retry_count: number
+          checkpoint_frequency: string
+          created_at: string | null
+          id: string
+          importance_threshold: number
+          saved_decisions: Json | null
+          timeout_seconds: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          auto_retry_count?: number
+          checkpoint_frequency?: string
+          created_at?: string | null
+          id?: string
+          importance_threshold?: number
+          saved_decisions?: Json | null
+          timeout_seconds?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          auto_retry_count?: number
+          checkpoint_frequency?: string
+          created_at?: string | null
+          id?: string
+          importance_threshold?: number
+          saved_decisions?: Json | null
+          timeout_seconds?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_credits: {
         Row: {
           created_at: string
@@ -2832,6 +3017,112 @@ export type Database = {
           wallet_address?: string
         }
         Relationships: []
+      }
+      workflow_actions: {
+        Row: {
+          action_data: Json | null
+          action_type: string
+          checkpoint_config: Json | null
+          confidence_score: number | null
+          created_at: string
+          description: string | null
+          estimated_time_seconds: number | null
+          id: string
+          instructions: string | null
+          name: string
+          order_index: number | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          understanding_id: string
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type: string
+          checkpoint_config?: Json | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_time_seconds?: number | null
+          id?: string
+          instructions?: string | null
+          name: string
+          order_index?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          understanding_id: string
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string
+          checkpoint_config?: Json | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_time_seconds?: number | null
+          id?: string
+          instructions?: string | null
+          name?: string
+          order_index?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          understanding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_actions_understanding_id_fkey"
+            columns: ["understanding_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_understandings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_understandings: {
+        Row: {
+          actions_identified: number | null
+          analysis_summary: string | null
+          confidence_score: number | null
+          created_at: string
+          id: string
+          manus_response: Json | null
+          processed_data: Json | null
+          recording_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actions_identified?: number | null
+          analysis_summary?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          manus_response?: Json | null
+          processed_data?: Json | null
+          recording_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          actions_identified?: number | null
+          analysis_summary?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          manus_response?: Json | null
+          processed_data?: Json | null
+          recording_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_understandings_recording_id_fkey"
+            columns: ["recording_id"]
+            isOneToOne: false
+            referencedRelation: "screen_recordings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       workflows: {
         Row: {

@@ -11,7 +11,9 @@ import {
   Video,
   Menu,
   User,
-  LogOut
+  LogOut,
+  Cpu,
+  Database
 } from 'lucide-react';
 import {
   Sidebar,
@@ -49,6 +51,18 @@ const navigationItems = [
     url: '/booky',
     icon: Sparkles,
     description: 'DeepBooking Platform'
+  },
+  {
+    title: 'Automation',
+    url: '/automation',
+    icon: Cpu,
+    description: 'Execute workflows'
+  },
+  {
+    title: 'Recordings',
+    url: '/recordings',
+    icon: Database,
+    description: 'Workflow library'
   },
   {
     title: 'AI Agents',
