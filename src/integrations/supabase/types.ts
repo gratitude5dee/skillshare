@@ -67,6 +67,68 @@ export type Database = {
           },
         ]
       }
+      angle_bank: {
+        Row: {
+          created_at: string
+          cta_type: string | null
+          difficulty: number | null
+          duration_hint: string | null
+          edit_style: string | null
+          example_links: string[] | null
+          hook: string
+          id: string
+          music_item_id: string
+          notes: string | null
+          sound_fit: number | null
+          trend_source: string | null
+          updated_at: string
+          variant_hooks: string[] | null
+          visual_pattern: string | null
+        }
+        Insert: {
+          created_at?: string
+          cta_type?: string | null
+          difficulty?: number | null
+          duration_hint?: string | null
+          edit_style?: string | null
+          example_links?: string[] | null
+          hook: string
+          id?: string
+          music_item_id: string
+          notes?: string | null
+          sound_fit?: number | null
+          trend_source?: string | null
+          updated_at?: string
+          variant_hooks?: string[] | null
+          visual_pattern?: string | null
+        }
+        Update: {
+          created_at?: string
+          cta_type?: string | null
+          difficulty?: number | null
+          duration_hint?: string | null
+          edit_style?: string | null
+          example_links?: string[] | null
+          hook?: string
+          id?: string
+          music_item_id?: string
+          notes?: string | null
+          sound_fit?: number | null
+          trend_source?: string | null
+          updated_at?: string
+          variant_hooks?: string[] | null
+          visual_pattern?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "angle_bank_music_item_id_fkey"
+            columns: ["music_item_id"]
+            isOneToOne: false
+            referencedRelation: "music_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       articles: {
         Row: {
           author: string | null
@@ -360,6 +422,50 @@ export type Database = {
         }
         Relationships: []
       }
+      content_assets: {
+        Row: {
+          asset_type: string
+          content_queue_id: string
+          created_at: string
+          file_path: string | null
+          file_url: string
+          generation_params: Json | null
+          id: string
+          metadata: Json | null
+          variant: string | null
+        }
+        Insert: {
+          asset_type: string
+          content_queue_id: string
+          created_at?: string
+          file_path?: string | null
+          file_url: string
+          generation_params?: Json | null
+          id?: string
+          metadata?: Json | null
+          variant?: string | null
+        }
+        Update: {
+          asset_type?: string
+          content_queue_id?: string
+          created_at?: string
+          file_path?: string | null
+          file_url?: string
+          generation_params?: Json | null
+          id?: string
+          metadata?: Json | null
+          variant?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_assets_content_queue_id_fkey"
+            columns: ["content_queue_id"]
+            isOneToOne: false
+            referencedRelation: "content_queue"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_folders: {
         Row: {
           created_at: string
@@ -394,6 +500,56 @@ export type Database = {
             columns: ["parent_folder_id"]
             isOneToOne: false
             referencedRelation: "content_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_insights: {
+        Row: {
+          angle_performance: Json | null
+          color_performance: Json | null
+          created_at: string
+          cta_performance: Json | null
+          hook_performance: Json | null
+          id: string
+          music_item_id: string | null
+          period_end: string
+          period_start: string
+          recommendations: string[] | null
+          summary: string | null
+        }
+        Insert: {
+          angle_performance?: Json | null
+          color_performance?: Json | null
+          created_at?: string
+          cta_performance?: Json | null
+          hook_performance?: Json | null
+          id?: string
+          music_item_id?: string | null
+          period_end: string
+          period_start: string
+          recommendations?: string[] | null
+          summary?: string | null
+        }
+        Update: {
+          angle_performance?: Json | null
+          color_performance?: Json | null
+          created_at?: string
+          cta_performance?: Json | null
+          hook_performance?: Json | null
+          id?: string
+          music_item_id?: string | null
+          period_end?: string
+          period_start?: string
+          recommendations?: string[] | null
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_insights_music_item_id_fkey"
+            columns: ["music_item_id"]
+            isOneToOne: false
+            referencedRelation: "music_items"
             referencedColumns: ["id"]
           },
         ]
@@ -453,6 +609,75 @@ export type Database = {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "content_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_queue: {
+        Row: {
+          angle_id: string
+          beats: Json | null
+          caption: string | null
+          created_at: string
+          cta: string | null
+          day: string
+          hashtags: string[] | null
+          id: string
+          music_item_id: string
+          palette: Json | null
+          performance_data: Json | null
+          script: string
+          status: string
+          thumb_prompt: string | null
+          updated_at: string
+        }
+        Insert: {
+          angle_id: string
+          beats?: Json | null
+          caption?: string | null
+          created_at?: string
+          cta?: string | null
+          day: string
+          hashtags?: string[] | null
+          id?: string
+          music_item_id: string
+          palette?: Json | null
+          performance_data?: Json | null
+          script: string
+          status?: string
+          thumb_prompt?: string | null
+          updated_at?: string
+        }
+        Update: {
+          angle_id?: string
+          beats?: Json | null
+          caption?: string | null
+          created_at?: string
+          cta?: string | null
+          day?: string
+          hashtags?: string[] | null
+          id?: string
+          music_item_id?: string
+          palette?: Json | null
+          performance_data?: Json | null
+          script?: string
+          status?: string
+          thumb_prompt?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_queue_angle_id_fkey"
+            columns: ["angle_id"]
+            isOneToOne: false
+            referencedRelation: "angle_bank"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_queue_music_item_id_fkey"
+            columns: ["music_item_id"]
+            isOneToOne: false
+            referencedRelation: "music_items"
             referencedColumns: ["id"]
           },
         ]
@@ -1334,6 +1559,108 @@ export type Database = {
           },
         ]
       }
+      music_items: {
+        Row: {
+          album: string | null
+          artists: string[] | null
+          bpm: number | null
+          channel: string | null
+          color_palette: Json | null
+          cover_art_url: string | null
+          created_at: string
+          danceability: number | null
+          duration: number | null
+          energy: number | null
+          genre_tags: string[] | null
+          id: string
+          instrumentation: string[] | null
+          isrc: string | null
+          key: string | null
+          metadata: Json | null
+          mode: string | null
+          mood_tags: string[] | null
+          platform: string
+          publish_date: string | null
+          release_date: string | null
+          source_url: string
+          spotify_id: string | null
+          tags: string[] | null
+          tempo_estimate: number | null
+          thumb_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          valence: number | null
+          youtube_id: string | null
+        }
+        Insert: {
+          album?: string | null
+          artists?: string[] | null
+          bpm?: number | null
+          channel?: string | null
+          color_palette?: Json | null
+          cover_art_url?: string | null
+          created_at?: string
+          danceability?: number | null
+          duration?: number | null
+          energy?: number | null
+          genre_tags?: string[] | null
+          id?: string
+          instrumentation?: string[] | null
+          isrc?: string | null
+          key?: string | null
+          metadata?: Json | null
+          mode?: string | null
+          mood_tags?: string[] | null
+          platform: string
+          publish_date?: string | null
+          release_date?: string | null
+          source_url: string
+          spotify_id?: string | null
+          tags?: string[] | null
+          tempo_estimate?: number | null
+          thumb_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          valence?: number | null
+          youtube_id?: string | null
+        }
+        Update: {
+          album?: string | null
+          artists?: string[] | null
+          bpm?: number | null
+          channel?: string | null
+          color_palette?: Json | null
+          cover_art_url?: string | null
+          created_at?: string
+          danceability?: number | null
+          duration?: number | null
+          energy?: number | null
+          genre_tags?: string[] | null
+          id?: string
+          instrumentation?: string[] | null
+          isrc?: string | null
+          key?: string | null
+          metadata?: Json | null
+          mode?: string | null
+          mood_tags?: string[] | null
+          platform?: string
+          publish_date?: string | null
+          release_date?: string | null
+          source_url?: string
+          spotify_id?: string | null
+          tags?: string[] | null
+          tempo_estimate?: number | null
+          thumb_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          valence?: number | null
+          youtube_id?: string | null
+        }
+        Relationships: []
+      }
       nodes: {
         Row: {
           created_at: string | null
@@ -1374,6 +1701,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      press_quotes: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: number
+          quote: string
+          source: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: number
+          quote: string
+          source: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: number
+          quote?: string
+          source?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1915,6 +2272,36 @@ export type Database = {
         }
         Relationships: []
       }
+      stats: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: number
+          metric_name: string
+          updated_at: string | null
+          user_id: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: number
+          metric_name: string
+          updated_at?: string | null
+          user_id?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: number
+          metric_name?: string
+          updated_at?: string | null
+          user_id?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
       storylines: {
         Row: {
           created_at: string
@@ -2287,6 +2674,39 @@ export type Database = {
           state?: string | null
           updated_at?: string | null
           venue_type?: string | null
+        }
+        Relationships: []
+      }
+      video_highlights: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+          url: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+          url: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+          url?: string
+          user_id?: string | null
         }
         Relationships: []
       }

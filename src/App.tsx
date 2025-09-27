@@ -15,6 +15,7 @@ import ChatPage from "./pages/ChatPage";
 import TasksPage from "./pages/TasksPage";
 import SettingsPage from "./pages/SettingsPage";
 import { DeepBookingPage } from "./pages/DeepBookingPage";
+import { ShortFormFactoryPage } from "./pages/ShortFormFactoryPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<DashboardOverviewPage />} />
+              <Route path="/short-form-factory" element={<ShortFormFactoryPage />} />
               <Route path="/agents" element={<AgentsPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/tasks" element={<TasksPage />} />

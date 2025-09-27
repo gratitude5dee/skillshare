@@ -7,7 +7,8 @@ import {
   ListChecks, 
   Settings,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Video
 } from 'lucide-react';
 import {
   Sidebar,
@@ -29,6 +30,12 @@ const navigationItems = [
     url: '/dashboard',
     icon: Home,
     description: 'Overview and analytics'
+  },
+  {
+    title: 'Short-Form Factory',
+    url: '/short-form-factory',
+    icon: Video,
+    description: 'Turn tracks into viral content'
   },
   {
     title: 'Booky',
