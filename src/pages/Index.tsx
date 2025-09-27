@@ -1,13 +1,32 @@
 
 import React from "react";
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "../components/learning-companion/Navbar";
 import Hero from "../components/learning-companion/Hero";
 import Features from "../components/learning-companion/Features";
 import NoMoreStuck from "../components/learning-companion/NoMoreStuck";
 import StudySmarter from "../components/learning-companion/StudySmarter";
 import Footer from "../components/learning-companion/Footer";
+import Dashboard from "./Dashboard";
 
 const Index: React.FC = () => {
+  const { user, loading } = useAuth();
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // Show dashboard for authenticated users
+  if (user) {
+    return <Dashboard />;
+  }
+
+  // Show landing page for unauthenticated users
   return (
     <div className="flex flex-col max-w-[1920px] mx-auto px-[70px] max-md:px-4">
       <div className="items-start bg-white relative flex gap-2.5 overflow-hidden">
