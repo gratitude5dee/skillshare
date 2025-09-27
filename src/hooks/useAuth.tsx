@@ -62,15 +62,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
+    // Prevent multiple concurrent sign-out attempts
+    if (loading) return;
+    
     console.log('Signing out user');
+    setLoading(true);
+    
     try {
+      // Check if we have a valid session before attempting to sign out
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      if (!currentSession) {
+        // No valid session exists, just clear local state
+        console.log('No valid session found, clearing local state');
+        setSession(null);
+        setUser(null);
+        return;
+      }
+      
       await supabase.auth.signOut();
-    } catch (error) {
+    } catch (error: any) {
       // Handle 403 errors gracefully - session might already be expired
-      console.log('Sign out error (handled):', error);
-      // Force clear local state
+      if (error?.status === 403 || error?.message?.includes('session_not_found')) {
+        console.log('Session already expired, clearing local state');
+      } else {
+        console.log('Sign out error (handled):', error);
+      }
+      
+      // Force clear local state and localStorage
       setSession(null);
       setUser(null);
+      
+      // Clear any remaining auth data from localStorage
+      localStorage.removeItem('supabase.auth.token');
+    } finally {
+      setLoading(false);
     }
   };
 
