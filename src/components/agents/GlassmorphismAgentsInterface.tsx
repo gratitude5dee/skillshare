@@ -17,16 +17,14 @@ const TASK_TYPES = [
 ];
 
 const CONNECTORS = [
-  { id: "polygon", label: "Polygon" },
-  { id: "supabase", label: "Supabase" },
-  { id: "huggingface", label: "HuggingFace" },
-  { id: "stripe", label: "Stripe" },
-  { id: "cloudflare", label: "Cloudflare" },
-  { id: "firecrawl", label: "Firecrawl" },
-  { id: "heygen", label: "HeyGen" },
-  { id: "invideo", label: "Invideo" },
-  { id: "minimax", label: "Minimax" },
-  { id: "gmail", label: "Gmail Send" },
+  { id: "Polygon", label: "Polygon" },
+  { id: "Supabase", label: "Supabase" },
+  { id: "HuggingFace", label: "HuggingFace" },
+  { id: "Stripe", label: "Stripe" },
+  { id: "Firecrawl", label: "Firecrawl" },
+  { id: "Minimax", label: "Minimax" },
+  { id: "Gmail", label: "Gmail" },
+  { id: "Google Calendar", label: "Google Calendar" },
 ];
 
 /** Agents catalog: type, title, subtitle/description */
@@ -370,7 +368,7 @@ Notes: ${payload.notes}
 ${payload.agent.subtitle}`;
 
       const task = await ManusAPIService.createTask(prompt, {
-        mode: 'speed',
+        mode: 'fast',
         connectors: payload.connectors
       });
 
