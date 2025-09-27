@@ -6,7 +6,8 @@ import {
   MessageSquare, 
   ListChecks, 
   Settings,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import {
   Sidebar,
@@ -28,6 +29,12 @@ const navigationItems = [
     url: '/dashboard',
     icon: Home,
     description: 'Overview and analytics'
+  },
+  {
+    title: 'Booky',
+    url: '/booky',
+    icon: Sparkles,
+    description: 'DeepBooking Platform'
   },
   {
     title: 'AI Agents',
