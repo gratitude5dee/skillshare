@@ -2,6 +2,7 @@
 import React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ConnectWalletButton from "./ConnectWalletButton";
+import manusLogo from "@/assets/manus-logo.png";
 
 export const Navbar: React.FC = () => {
   const isMobile = useIsMobile();
@@ -14,9 +15,9 @@ export const Navbar: React.FC = () => {
       <div className="self-stretch flex min-w-60 w-full flex-col items-center flex-1 shrink basis-[0%] my-auto pt-6">
         <div className={`min-h-[100px] ${isMobile ? 'w-[160px]' : 'w-[223px]'} max-w-full`}>
           <img
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/5649d9f7037e46bfb785405d17b2e6b707bf0d6d?placeholderIfAbsent=true"
+            src={manusLogo}
             className="aspect-[2.22] object-contain w-full"
-            alt="WZRD.work Logo"
+            alt="Manus Logo"
           />
         </div>
       </div>
