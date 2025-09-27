@@ -16,10 +16,6 @@ export const LoadingStateManager: React.FC<LoadingStateManagerProps> = ({
   const [hasSeenIntro, setHasSeenIntro] = useState(false);
 
   useEffect(() => {
-    // For testing purposes, clear localStorage to always show intro
-    // Remove this line in production
-    localStorage.removeItem('wzrd-intro-seen');
-    
     // Check if user has seen intro before (localStorage)
     const hasSeenBefore = localStorage.getItem('wzrd-intro-seen') === 'true';
     console.log('LoadingStateManager: hasSeenBefore =', hasSeenBefore);

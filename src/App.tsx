@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { LoadingStateManager } from "@/components/animations/LoadingStateManager";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -26,29 +25,27 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <LoadingStateManager showIntro={true} skipIntroOnRepeat={true}>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                <Route path="/dashboard" element={<DashboardOverviewPage />} />
-                <Route path="/short-form-factory" element={<ShortFormFactoryPage />} />
-                <Route path="/agents" element={<AgentsPage />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/tasks" element={<TasksPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/booky" element={<DeepBookingPage />} />
-                <Route path="/automation" element={<AutomationPage />} />
-                <Route path="/recordings" element={<RecordingsPage />} />
-              </Route>
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </LoadingStateManager>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<DashboardOverviewPage />} />
+              <Route path="/short-form-factory" element={<ShortFormFactoryPage />} />
+              <Route path="/agents" element={<AgentsPage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/tasks" element={<TasksPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/booky" element={<DeepBookingPage />} />
+              <Route path="/automation" element={<AutomationPage />} />
+              <Route path="/recordings" element={<RecordingsPage />} />
+            </Route>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
