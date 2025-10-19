@@ -7,6 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const STORAGE_THRESHOLD = 20_000_000; // 20MB in bytes
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -61,19 +63,30 @@ serve(async (req) => {
 
     console.log(`[Analysis] Created analysis record: ${analysis.id}`);
 
-    // Download video from storage
+    // Download video based on storage type
     let videoData: Blob;
-    if (recording.file_url) {
+    
+    if (recording.storage_type === 'supabase' && recording.file_url) {
+      // Download from Supabase Storage (>20MB files)
+      const storagePath = recording.file_url.split('/').slice(-2).join('/');
+      console.log(`[Analysis] Downloading from storage: ${storagePath}`);
+      
       const { data, error } = await supabase.storage
-        .from('content-library')
-        .download(recording.file_url);
+        .from('recordings')
+        .download(storagePath);
       
       if (error || !data) {
         throw new Error(`Failed to download video: ${error?.message}`);
       }
       videoData = data;
+    } else if (recording.storage_type === 'local' && recording.raw_data?.video_data) {
+      // Retrieve inline data (≤20MB files)
+      console.log(`[Analysis] Using inline video data`);
+      const base64Data = recording.raw_data.video_data;
+      const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      videoData = new Blob([binaryData], { type: recording.mime_type || 'video/webm' });
     } else {
-      throw new Error('No file URL found for recording');
+      throw new Error('Invalid storage configuration - no valid video data source');
     }
 
     console.log(`[Analysis] Downloaded video: ${videoData.size} bytes`);

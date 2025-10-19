@@ -9,6 +9,10 @@ interface Recording {
   file_url?: string;
   file_size?: number;
   duration_seconds?: number;
+  duration?: number;
+  storage_type?: string;
+  mime_type?: string;
+  raw_data?: any;
   status: string;
   created_at: string;
   updated_at: string;
@@ -52,41 +56,72 @@ export function useRecordings() {
 
   const uploadRecording = async (file: File, metadata: { title: string; description: string }) => {
     try {
-      // Upload file to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `recordings/${fileName}`;
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error('Not authenticated');
 
-      const { error: uploadError } = await supabase.storage
-        .from('content-library')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
+      const STORAGE_THRESHOLD = 20_000_000; // 20MB
+      const useInlineStorage = file.size <= STORAGE_THRESHOLD;
+
+      console.log(`[Upload] File size: ${(file.size / 1_000_000).toFixed(2)}MB, strategy: ${useInlineStorage ? 'inline' : 'bucket'}`);
+
+      let fileUrl: string | null = null;
+      let rawData: any = null;
+
+      if (useInlineStorage) {
+        // Store inline as base64 in database (≤20MB)
+        const arrayBuffer = await file.arrayBuffer();
+        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        rawData = {
+          video_data: base64,
+          original_filename: file.name,
+          file_type: file.type,
+          uploaded_at: new Date().toISOString()
+        };
+        
+        toast({
+          title: "Storing video inline",
+          description: "Small video will be stored in database for fast access",
         });
+      } else {
+        // Upload to Supabase Storage (>20MB)
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
-      if (uploadError) {
-        throw uploadError;
+        const { error: uploadError } = await supabase.storage
+          .from('recordings')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('recordings')
+          .getPublicUrl(fileName);
+        
+        fileUrl = urlData.publicUrl;
+        
+        toast({
+          title: "Uploading to storage",
+          description: "Large video uploaded to cloud storage",
+        });
       }
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('content-library')
-        .getPublicUrl(filePath);
 
       // Create recording record
       const { data: recording, error: dbError } = await supabase
         .from('screen_recordings')
         .insert([{
-          user_id: (await supabase.auth.getUser()).data.user?.id,
+          user_id: user.id,
           title: metadata.title,
           description: metadata.description,
-          file_url: urlData.publicUrl,
+          file_url: fileUrl,
           file_size: file.size,
-          raw_data: { 
-            original_filename: file.name,
-            file_type: file.type,
-            uploaded_at: new Date().toISOString()
-          },
+          storage_type: useInlineStorage ? 'local' : 'supabase',
+          mime_type: file.type || 'video/webm',
+          raw_data: rawData,
           status: 'pending'
         }])
         .select()
@@ -138,13 +173,13 @@ export function useRecordings() {
     try {
       const recording = recordings.find(r => r.id === recordingId);
       
-      // Delete file from storage if it exists
-      if (recording?.file_url) {
-        const filePath = recording.file_url.split('/').pop();
-        if (filePath) {
+      // Delete file from storage if it exists (only for bucket storage)
+      if (recording?.file_url && recording?.storage_type === 'supabase') {
+        const storagePath = recording.file_url.split('/').slice(-2).join('/');
+        if (storagePath) {
           await supabase.storage
-            .from('content-library')
-            .remove([`recordings/${filePath}`]);
+            .from('recordings')
+            .remove([storagePath]);
         }
       }
 
