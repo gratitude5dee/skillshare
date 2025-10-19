@@ -8,10 +8,11 @@ import { AutomationInterface } from '@/components/automation/AutomationInterface
 import { ActionList } from '@/components/automation/ActionList';
 import { ExecutionViewer } from '@/components/automation/ExecutionViewer';
 import { MetricsOverview } from '@/components/automation/MetricsOverview';
+import { RecordingInterface } from '@/components/automation/RecordingInterface';
 import { useAutomation } from '@/hooks/useAutomation';
 
 export function AutomationPage() {
-  const [activeTab, setActiveTab] = useState('execute');
+  const [activeTab, setActiveTab] = useState('record');
   const { 
     isExecuting, 
     currentAction, 
@@ -66,7 +67,8 @@ export function AutomationPage() {
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
           <div className="border-b border-border px-6">
-            <TabsList className="grid w-full max-w-md grid-cols-3">
+            <TabsList className="grid w-full max-w-md grid-cols-4">
+              <TabsTrigger value="record">Record</TabsTrigger>
               <TabsTrigger value="execute">Execute</TabsTrigger>
               <TabsTrigger value="monitor">Monitor</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -74,6 +76,10 @@ export function AutomationPage() {
           </div>
 
           <div className="flex-1 overflow-hidden">
+            <TabsContent value="record" className="h-full m-0">
+              <RecordingInterface />
+            </TabsContent>
+
             <TabsContent value="execute" className="h-full m-0">
               <div className="grid grid-cols-12 gap-6 h-full p-6">
                 {/* Actions Sidebar */}
