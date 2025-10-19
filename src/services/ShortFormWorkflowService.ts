@@ -365,11 +365,10 @@ Establish ongoing optimization loop for sustained viral content creation.
 
       if (error) throw error;
 
-      // Get angle count
+      // Get angle count (angle_bank is a global resource, not tied to specific music items)
       const { count: angleCount } = await supabase
         .from('angle_bank')
-        .select('*', { count: 'exact' })
-        .eq('music_item_id', musicItemId);
+        .select('*', { count: 'exact', head: true });
 
       // Get content queue count
       const { count: contentCount } = await supabase
