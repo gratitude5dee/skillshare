@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+Skillshare
 
 ## Project info
 
