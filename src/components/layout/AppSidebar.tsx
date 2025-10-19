@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import manusLogo from '@/assets/manus-logo.png';
+import geminiLogo from '@/assets/gemini-logo.png';
 
 const navigationItems = [
   {
@@ -117,7 +117,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-border">
         <div className="flex items-center justify-between px-3 py-4">
           <div className="flex items-center gap-3">
-            <img src={manusLogo} alt="Manus" className="h-8 w-auto" />
+            <img src={geminiLogo} alt="Gemini" className="h-8 w-auto" />
             {!collapsed && (
               <div>
                 <h1 className="text-lg font-bold text-foreground">SkillShare</h1>

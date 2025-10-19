@@ -3,7 +3,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { LogOut, MessageSquare, Sparkles, Link, BarChart3, Calendar, Search } from 'lucide-react';
-import manusLogo from '@/assets/manus-logo.png';
+import geminiLogo from '@/assets/gemini-logo.png';
 
 interface AgentSidebarProps {
   onAgentSelect: (agentId: string) => void;
@@ -78,7 +78,7 @@ export const AgentSidebar: React.FC<AgentSidebarProps> = ({ onAgentSelect, onCha
     <Sidebar className="w-80">
       <SidebarHeader className="p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <img src={manusLogo} alt="Manus" className="h-8 w-auto" />
+          <img src={geminiLogo} alt="Gemini" className="h-8 w-auto" />
           <div>
             <h1 className="font-bold text-lg text-sidebar-foreground">WZRD.work</h1>
             <p className="text-xs text-sidebar-foreground/70">powered by Gemini</p>

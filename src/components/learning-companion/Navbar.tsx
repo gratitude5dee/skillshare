@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ConnectWalletButton from "./ConnectWalletButton";
-import manusLogo from "@/assets/manus-logo.png";
+import geminiLogo from "@/assets/gemini-logo.png";
 
 export const Navbar: React.FC = () => {
   const isMobile = useIsMobile();
@@ -29,9 +29,9 @@ export const Navbar: React.FC = () => {
           }}
         >
           <motion.img
-            src={manusLogo}
-            className="aspect-[2.22] object-contain w-full relative z-10"
-            alt="Manus Logo"
+            src={geminiLogo}
+            className="w-10 h-10 object-contain relative z-10"
+            alt="Gemini Logo"
             initial={{ scale: 0.9, opacity: 0, y: -10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}

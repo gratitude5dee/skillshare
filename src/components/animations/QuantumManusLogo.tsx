@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import manusLogo from '@/assets/manus-logo.png';
+import geminiLogo from '@/assets/gemini-logo.png';
 
 interface QuantumManusLogoProps {
   phase: 'silence' | 'whisper' | 'genesis' | 'consciousness' | 'integration';
@@ -254,7 +254,7 @@ export const QuantumManusLogo: React.FC<QuantumManusLogoProps> = ({
         transition={{ duration: 1.2, ease: "easeOut" }}
       >
         <img 
-          src={manusLogo} 
+          src={geminiLogo} 
           alt="Gemini Logo" 
           className="w-24 h-24 object-contain"
           style={{

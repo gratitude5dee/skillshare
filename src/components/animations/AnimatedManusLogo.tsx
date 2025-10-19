@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import manusLogo from '@/assets/manus-logo.png';
+import geminiLogo from '@/assets/gemini-logo.png';
 
 interface AnimatedManusLogoProps {
   phase: 'void' | 'genesis' | 'consciousness' | 'integration';
@@ -47,8 +47,8 @@ export const AnimatedManusLogo: React.FC<AnimatedManusLogoProps> = ({ phase, onC
         }}
       >
         <img 
-          src={manusLogo} 
-          alt="Manus" 
+          src={geminiLogo} 
+          alt="Gemini" 
           className="h-16 w-auto filter drop-shadow-lg"
         />
       </motion.div>

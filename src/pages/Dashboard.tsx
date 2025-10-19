@@ -5,7 +5,7 @@ import { AgentModal } from '@/components/dashboard/AgentModal';
 import { ChatInterface } from '@/components/dashboard/ChatInterface';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, LogOut, Grid3X3, Bot } from 'lucide-react';
-import manusLogo from '@/assets/manus-logo.png';
+import geminiLogo from '@/assets/gemini-logo.png';
 
 export const Dashboard: React.FC = () => {
   const { signOut } = useAuth();
@@ -30,7 +30,7 @@ export const Dashboard: React.FC = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <img src={manusLogo} alt="Manus" className="h-10 w-auto" />
+              <img src={geminiLogo} alt="Gemini" className="h-10 w-auto" />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">WZRD.work</h1>
                 <p className="text-sm text-muted-foreground">powered by Gemini</p>
