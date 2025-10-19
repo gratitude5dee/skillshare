@@ -94,7 +94,7 @@ export function AppSidebar() {
             <img src={manusLogo} alt="Manus" className="h-8 w-auto" />
             {!collapsed && (
               <div>
-                <h1 className="text-lg font-bold text-foreground">WZRD.work</h1>
+                <h1 className="text-lg font-bold text-foreground">SkillShare</h1>
                 <p className="text-xs text-muted-foreground">powered by Gemini</p>
               </div>
             )}
