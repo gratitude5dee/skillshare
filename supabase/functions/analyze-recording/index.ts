@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.21.0";
+import { GoogleAIFileManager } from "https://esm.sh/@google/generative-ai@0.21.0/server";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -105,6 +106,8 @@ serve(async (req) => {
     }
 
     const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
+    const fileManager = new GoogleAIFileManager(GOOGLE_API_KEY);
+    
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.0-flash-exp",
       generationConfig: {
@@ -116,12 +119,20 @@ serve(async (req) => {
       },
     });
 
-    // Convert video to base64 for inline data
+    // Save video to temporary file
+    const tempFilePath = await Deno.makeTempFile({ suffix: ".webm" });
     const arrayBuffer = await videoData.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    const base64Video = btoa(
-      bytes.reduce((data, byte) => data + String.fromCharCode(byte), '')
-    );
+    await Deno.writeFile(tempFilePath, new Uint8Array(arrayBuffer));
+    
+    console.log('[Analysis] Uploading video to Gemini File API...');
+
+    // Upload video to Gemini File API
+    const uploadResult = await fileManager.uploadFile(tempFilePath, {
+      mimeType: recording.mime_type || "video/webm",
+      displayName: recording.file_name || `recording-${recordingId}`,
+    });
+
+    console.log(`[Analysis] File uploaded to Gemini: ${uploadResult.file.uri}`);
 
     const analysisPrompt = `You are an expert at analyzing screen recordings to extract detailed workflow automation steps.
 
@@ -166,14 +177,14 @@ Return ONLY valid JSON in this exact format:
   ]
 }`;
 
-    console.log('[Analysis] Sending video to Gemini API...');
+    console.log('[Analysis] Analyzing video with Gemini API...');
 
-    // Send to Gemini with proper video format
+    // Send to Gemini using file URI (avoids memory issues with base64)
     const result = await model.generateContent([
       {
-        inlineData: {
-          mimeType: recording.mime_type || "video/webm",
-          data: base64Video,
+        fileData: {
+          mimeType: uploadResult.file.mimeType,
+          fileUri: uploadResult.file.uri,
         },
       },
       { text: analysisPrompt },
@@ -281,6 +292,21 @@ ${step.frameAnalysis ? `**Frame Context**: ${step.frameAnalysis}\n` : ''}
 
     console.log('[Analysis] Analysis completed successfully');
 
+    // Cleanup: Delete temp file and Gemini file
+    try {
+      await Deno.remove(tempFilePath);
+      console.log('[Analysis] Temporary file deleted');
+    } catch (cleanupError) {
+      console.warn('[Analysis] Failed to delete temp file:', cleanupError);
+    }
+
+    try {
+      await fileManager.deleteFile(uploadResult.file.name);
+      console.log('[Analysis] Gemini file deleted');
+    } catch (cleanupError) {
+      console.warn('[Analysis] Failed to delete Gemini file:', cleanupError);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -299,10 +325,19 @@ ${step.frameAnalysis ? `**Frame Context**: ${step.frameAnalysis}\n` : ''}
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     
+    // Check for specific error types
+    let userFriendlyMessage = errorMessage;
+    if (errorMessage.includes('Memory limit')) {
+      userFriendlyMessage = 'Video file is too large to process. Please try a shorter recording.';
+    } else if (errorMessage.includes('timeout')) {
+      userFriendlyMessage = 'Analysis timed out. Please try a shorter recording or reduce video quality.';
+    }
+    
     return new Response(
       JSON.stringify({
         success: false,
-        error: errorMessage,
+        error: userFriendlyMessage,
+        details: errorMessage,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
