@@ -8,22 +8,97 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface Coordinates {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface WorkflowStep {
+  stepNumber: number;
+  timestampMs: number;
+  actionType: string;
+  actionDescription: string;
+  targetElement: string;
+  coordinates: Coordinates | null;
+  confidenceScore: number;
+  frameAnalysis?: string;
+}
+
 interface VideoAnalysisResult {
-  totalDuration: number;
+  totalDurationMs: number;
   framesAnalyzed: number;
   complexityScore: number;
-  detectedUIElements: number;
   workflowSummary: string;
-  steps: Array<{
-    stepNumber: number;
-    timestampMs: number;
-    actionType: string;
-    actionDescription: string;
-    targetElement: string;
-    coordinates?: { x: number; y: number; width: number; height: number };
-    confidenceScore: number;
-    frameAnalysis: string;
-  }>;
+  detectedUIElements?: number;
+  steps: WorkflowStep[];
+}
+
+// Validation function for analysis results
+function validateAnalysisResult(data: any): VideoAnalysisResult {
+  // Validate required top-level fields
+  if (!data.totalDurationMs || typeof data.totalDurationMs !== 'number') {
+    throw new Error('Missing or invalid totalDurationMs');
+  }
+  
+  if (typeof data.framesAnalyzed !== 'number') {
+    throw new Error('Missing or invalid framesAnalyzed');
+  }
+  
+  if (typeof data.complexityScore !== 'number' || data.complexityScore < 0 || data.complexityScore > 1) {
+    throw new Error('complexityScore must be between 0.0 and 1.0');
+  }
+  
+  if (!data.workflowSummary || typeof data.workflowSummary !== 'string') {
+    throw new Error('Missing or invalid workflowSummary');
+  }
+  
+  if (!Array.isArray(data.steps) || data.steps.length === 0) {
+    throw new Error('Missing or invalid steps array - at least one step is required');
+  }
+  
+  // Validate each step
+  data.steps.forEach((step: any, idx: number) => {
+    if (!step.stepNumber || typeof step.stepNumber !== 'number') {
+      throw new Error(`Step ${idx}: missing or invalid stepNumber`);
+    }
+    
+    if (!step.timestampMs || typeof step.timestampMs !== 'number') {
+      throw new Error(`Step ${idx}: missing or invalid timestampMs`);
+    }
+    
+    if (!step.actionType || typeof step.actionType !== 'string') {
+      throw new Error(`Step ${idx}: missing or invalid actionType`);
+    }
+    
+    if (!step.actionDescription || typeof step.actionDescription !== 'string') {
+      throw new Error(`Step ${idx}: missing or invalid actionDescription`);
+    }
+    
+    if (!step.targetElement || typeof step.targetElement !== 'string') {
+      throw new Error(`Step ${idx}: missing or invalid targetElement`);
+    }
+    
+    if (typeof step.confidenceScore !== 'number' || step.confidenceScore < 0 || step.confidenceScore > 1) {
+      throw new Error(`Step ${idx}: confidenceScore must be between 0.0 and 1.0`);
+    }
+    
+    // Validate coordinates if present
+    if (step.coordinates !== null && step.coordinates !== undefined) {
+      if (
+        typeof step.coordinates.x !== 'number' ||
+        typeof step.coordinates.y !== 'number' ||
+        typeof step.coordinates.width !== 'number' ||
+        typeof step.coordinates.height !== 'number'
+      ) {
+        console.warn(`Step ${idx}: Invalid coordinates structure, setting to null`);
+        step.coordinates = null;
+      }
+    }
+  });
+  
+  return data as VideoAnalysisResult;
 }
 
 serve(async (req) => {
@@ -182,46 +257,65 @@ serve(async (req) => {
 
     const analysisPrompt = `You are an expert at analyzing screen recordings to extract detailed workflow automation steps.
 
-Analyze this screen recording video carefully. Process it at 1 FPS to capture all user interactions.
+Analyze this screen recording video frame-by-frame at 1 FPS.
 
 For EACH significant user action detected, provide:
 
-1. **stepNumber**: Sequential number (1, 2, 3...)
-2. **timestampMs**: Exact timestamp in milliseconds when action occurred
-3. **actionType**: One of: click, doubleClick, rightClick, type, navigate, scroll, select, drag, hover, keyPress
-4. **actionDescription**: Clear, detailed description of what the user did
-5. **targetElement**: Description of the UI element interacted with
-6. **coordinates**: If visible, provide {x, y, width, height} in pixels
-7. **confidenceScore**: Your confidence in this detection (0.0 to 1.0)
-8. **frameAnalysis**: Brief description of what's visible in the frame
+1.  **stepNumber**: Sequential number (1, 2, 3...)
+2.  **timestampMs**: Exact timestamp in milliseconds when action occurred
+3.  **actionType**: One of: 'CLICK', 'DOUBLE_CLICK', 'RIGHT_CLICK', 'TYPE_TEXT', 'NAVIGATE_URL', 'SCROLL', 'SELECT_OPTION', 'DRAG', 'HOVER', 'KEY_PRESS'
+4.  **actionDescription**: Clear, detailed description of what the user did (e.g., "Clicked the 'Start Recording' button")
+5.  **targetElement**: Description of the UI element (e.g., "Blue button labeled 'Start Recording'")
+6.  **coordinates**: If visible, provide {x, y, width, height} in pixels from top-left. Use null if not applicable.
+7.  **confidenceScore**: Your confidence in this detection (0.0 to 1.0)
+8.  **frameAnalysis**: Brief description of what's visible in the frame at this moment
 
 Also provide overall metrics:
-- **totalDuration**: Total video length in seconds
-- **framesAnalyzed**: Total frames examined
-- **complexityScore**: 0.0 to 1.0 rating of workflow complexity
-- **detectedUIElements**: Count of unique UI elements identified
-- **workflowSummary**: 2-3 sentence summary of the workflow
+-   **totalDurationMs**: Total video length in milliseconds
+-   **framesAnalyzed**: Total frames you examined
+-   **complexityScore**: 0.0 to 1.0 rating of workflow complexity
+-   **detectedUIElements**: Count of unique UI elements you identified
+-   **workflowSummary**: 2-3 sentence summary of the overall workflow
 
-Return ONLY valid JSON in this exact format:
+CRITICAL REQUIREMENTS:
+-   Detect EVERY interaction.
+-   Be extremely precise with timestamps.
+-   Provide actionable descriptions suitable for automation.
+-   Maintain high confidence scores only for clear actions.
+
+You MUST respond with ONLY a valid JSON object that strictly adheres to the following schema:
+
 {
-  "totalDuration": 120,
+  "totalDurationMs": 120000,
   "framesAnalyzed": 120,
   "complexityScore": 0.65,
   "detectedUIElements": 15,
-  "workflowSummary": "User navigated through the automation interface...",
+  "workflowSummary": "User navigated through the automation interface, created a new workflow, and configured multiple steps including API calls and data transformations.",
   "steps": [
     {
       "stepNumber": 1,
       "timestampMs": 3000,
-      "actionType": "click",
-      "actionDescription": "Clicked on the navigation menu",
-      "targetElement": "Menu button in top navigation",
+      "actionType": "CLICK",
+      "actionDescription": "Clicked on the 'Automation' navigation menu item to access the automation dashboard",
+      "targetElement": "Navigation menu button labeled 'Automation' in the left sidebar",
       "coordinates": { "x": 27, "y": 224, "width": 120, "height": 40 },
       "confidenceScore": 0.95,
-      "frameAnalysis": "Dashboard view with navigation bar visible"
+      "frameAnalysis": "Dashboard view with left navigation bar visible, user cursor hovering over automation menu item"
+    },
+    {
+      "stepNumber": 2,
+      "timestampMs": 7500,
+      "actionType": "TYPE_TEXT",
+      "actionDescription": "Typed 'Daily Report Automation' into the workflow name input field",
+      "targetElement": "Text input field with placeholder 'Enter workflow name'",
+      "coordinates": null,
+      "confidenceScore": 0.88,
+      "frameAnalysis": "Create workflow dialog open with input field focused and text being entered"
     }
   ]
-}`;
+}
+
+Do not include any other text, markdown formatting, or explanations outside the JSON object.`;
 
     console.log('[Analysis] Analyzing video with Gemini API...');
 
@@ -241,28 +335,40 @@ Return ONLY valid JSON in this exact format:
     
     console.log('[Analysis] Received response from Gemini');
 
-    // Parse the JSON response
+    // Parse and validate the JSON response
     let analysisResult: VideoAnalysisResult;
     try {
-      // Remove markdown code blocks if present
+      // Aggressive markdown and text cleanup
       const cleanedText = analysisText
-        .replace(/```json\n?/g, '')
-        .replace(/```\n?/g, '')
+        .replace(/```json\s*/gi, '')
+        .replace(/```\s*/g, '')
+        .replace(/^[^{]*/, '') // Remove text before first {
+        .replace(/[^}]*$/, '') // Remove text after last }
         .trim();
       
-      analysisResult = JSON.parse(cleanedText);
+      console.log('[Analysis] Parsing cleaned JSON response...');
+      const rawResult = JSON.parse(cleanedText);
+      
+      // Validate schema
+      console.log('[Analysis] Validating analysis result schema...');
+      analysisResult = validateAnalysisResult(rawResult);
+      
+      console.log(`[Analysis] Successfully validated ${analysisResult.steps.length} workflow steps`);
+      
     } catch (parseError) {
-      console.error('[Analysis] Failed to parse JSON:', analysisText);
-      const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown parsing error';
-      throw new Error(`Failed to parse AI response: ${errorMsg}`);
+      console.error('[Analysis] Failed to parse or validate JSON response');
+      console.error('[Analysis] Raw response:', analysisText);
+      
+      if (parseError instanceof Error) {
+        console.error('[Analysis] Error details:', parseError.message);
+        throw new Error(`AI response validation failed: ${parseError.message}. The model may need to re-analyze this video.`);
+      }
+      
+      throw new Error('Failed to parse AI response: Unknown error occurred');
     }
 
-    // Validate the analysis result
-    if (!analysisResult.steps || !Array.isArray(analysisResult.steps)) {
-      throw new Error('Invalid analysis result: missing steps array');
-    }
-
-    console.log(`[Analysis] Extracted ${analysisResult.steps.length} workflow steps`);
+    console.log(`[Analysis] Successfully extracted and validated ${analysisResult.steps.length} workflow steps`);
+    console.log(`[Analysis] Complexity score: ${analysisResult.complexityScore.toFixed(2)}, Frames analyzed: ${analysisResult.framesAnalyzed}`);
 
     // Decrement user quota
     const { error: quotaError } = await supabaseClient.rpc('decrement_user_quota', {
@@ -303,7 +409,7 @@ Return ONLY valid JSON in this exact format:
 
 **Recording:** ${recording.title}  
 **Analyzed:** ${new Date().toLocaleString()}  
-**Duration:** ${analysisResult.totalDuration}s  
+**Duration:** ${(analysisResult.totalDurationMs / 1000).toFixed(1)}s
 
 ---
 
@@ -315,10 +421,10 @@ ${analysisResult.workflowSummary}
 
 | Metric | Value |
 |--------|-------|
-| **Total Duration** | ${analysisResult.totalDuration} seconds |
+| **Total Duration** | ${(analysisResult.totalDurationMs / 1000).toFixed(1)} seconds |
 | **Frames Analyzed** | ${analysisResult.framesAnalyzed} |
 | **Complexity Score** | ${(analysisResult.complexityScore * 100).toFixed(1)}% |
-| **UI Elements Detected** | ${analysisResult.detectedUIElements} |
+| **UI Elements Detected** | ${analysisResult.detectedUIElements || 'N/A'} |
 | **Total Steps** | ${analysisResult.steps.length} |
 | **Average Confidence** | ${analysisResult.steps.length > 0 ? (analysisResult.steps.reduce((sum, s) => sum + s.confidenceScore, 0) / analysisResult.steps.length * 100).toFixed(1) : 0}% |
 
