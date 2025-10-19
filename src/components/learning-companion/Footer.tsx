@@ -1,147 +1,94 @@
-import React from "react";
+import geminiLogo from "@/assets/gemini-logo.png";
+import { Twitter, Linkedin, Github, Youtube } from "lucide-react";
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="items-stretch bg-[#0A0E09] flex w-full flex-col overflow-hidden justify-center px-16 py-10 max-md:max-w-full max-md:px-5">
-      <div className="w-full max-md:max-w-full">
-        <div className="flex w-full items-stretch flex-wrap max-md:max-w-full">
-          <div className="flex min-w-60 flex-col flex-1 shrink basis-[0%] max-md:max-w-full">
-            <div className="self-stretch flex w-full flex-col items-stretch max-md:max-w-full">
-              <div className="text-white text-sm font-bold leading-[1.4] max-md:max-w-full">
-                Connect with us
-              </div>
-              <div className="flex items-center gap-4 mt-3">
-                <div className="self-stretch flex gap-2 my-auto">
-                  <a href="#" aria-label="Social media link">
-                    <div className="justify-center items-center bg-[#333] flex gap-2.5 w-8 h-8 px-1 rounded-[999px]">
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/79a67a85abe95ba4bcdec56a436fad3acc58b147?placeholderIfAbsent=true"
-                        className="aspect-[1] object-contain w-6 self-stretch my-auto"
-                        alt="Social icon 1"
-                      />
-                    </div>
-                  </a>
-                  <a href="#" aria-label="Social media link">
-                    <div className="justify-center items-center bg-[#333] flex gap-2.5 w-8 h-8 px-1 rounded-[999px]">
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/0d5d6522d7889983ed20cb089cfb34838f8c20dc?placeholderIfAbsent=true"
-                        className="aspect-[1] object-contain w-6 self-stretch my-auto"
-                        alt="Social icon 2"
-                      />
-                    </div>
-                  </a>
-                  <a href="#" aria-label="Social media link">
-                    <div className="justify-center items-center bg-[#333] flex gap-2.5 w-8 h-8 px-1 rounded-[999px]">
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/186d681ec9b60cac7599f7f105298cfbd8a6a30a?placeholderIfAbsent=true"
-                        className="aspect-[1] object-contain w-6 self-stretch my-auto"
-                        alt="Social icon 3"
-                      />
-                    </div>
-                  </a>
-                  <a href="#" aria-label="Social media link">
-                    <div className="justify-center items-center bg-[#333] flex gap-2.5 w-8 h-8 px-1 rounded-[999px]">
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/5ce9c8228bb45c42bcdccdf73f9f10dd43e604fc?placeholderIfAbsent=true"
-                        className="aspect-[1] object-contain w-6 self-stretch my-auto"
-                        alt="Social icon 4"
-                      />
-                    </div>
-                  </a>
-                </div>
-              </div>
+    <footer className="relative bg-[#050816] border-t border-white/5 pt-20 pb-10">
+      <div className="max-w-[1400px] mx-auto px-8 lg:px-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          {/* Brand Column */}
+          <div className="md:col-span-1">
+            <div className="flex items-center gap-3 mb-4">
+              <img src={geminiLogo} alt="WZRD.work" className="w-10 h-10" />
+              <span className="text-xl font-headline font-bold text-white">
+                WZRD.work
+              </span>
             </div>
-            <div className="flex gap-4 mt-6">
-              <a href="#" aria-label="App Store">
-                <div className="bg-[#0A0E09] flex w-[120px] shrink-0 h-10 rounded-[5px]" />
-              </a>
-              <a href="#" aria-label="Google Play">
-                <div className="bg-[#0A0E09] flex w-[120px] shrink-0 h-10 rounded-[5px]" />
-              </a>
-            </div>
-            <div className="justify-center items-center bg-[#333] flex min-h-8 w-[124px] max-w-full gap-2 text-[15px] text-white font-bold whitespace-nowrap leading-none mt-6 pl-3 pr-2 py-1.5 rounded-[28px]">
-              <div className="self-stretch my-auto">Manus.com</div>
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/e912f18395f94da4d24d6a6ad9a4fde4fe6619ee?placeholderIfAbsent=true"
-                className="aspect-[1] object-contain w-4 self-stretch shrink-0 my-auto"
-                alt="Dropdown icon"
-              />
+            <p className="text-white/60 text-sm mb-6">
+              Intelligent automation for modern teams
+            </p>
+            
+            {/* Social Links */}
+            <div className="flex items-center gap-3">
+              {[
+                { icon: Twitter, label: 'Twitter' },
+                { icon: Linkedin, label: 'LinkedIn' },
+                { icon: Github, label: 'GitHub' },
+                { icon: Youtube, label: 'YouTube' },
+              ].map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.label}
+                    href="#"
+                    className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group"
+                    aria-label={social.label}
+                  >
+                    <Icon className="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
+                  </a>
+                );
+              })}
             </div>
           </div>
-          <div className="flex flex-col overflow-hidden items-stretch leading-[1.4] w-60">
-            <div className="text-white text-sm font-bold">Company</div>
-            <nav className="text-xs text-[#bababa] font-normal mt-3">
-              <a href="#" className="block hover:text-white">
-                About us
+
+          {/* Navigation Columns */}
+          {[
+            {
+              title: 'Product',
+              links: ['Features', 'Pricing', 'Integrations', 'Changelog', 'Roadmap'],
+            },
+            {
+              title: 'Resources',
+              links: ['Documentation', 'Blog', 'Case Studies', 'Community', 'Support'],
+            },
+            {
+              title: 'Company',
+              links: ['About', 'Careers', 'Contact', 'Privacy', 'Terms'],
+            },
+          ].map((column) => (
+            <div key={column.title}>
+              <h4 className="text-white font-semibold mb-4">{column.title}</h4>
+              <ul className="space-y-3">
+                {column.links.map((link) => (
+                  <li key={link}>
+                    <a
+                      href="#"
+                      className="text-white/60 hover:text-white text-sm transition-colors"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-white/40 text-sm">
+            © 2025 WZRD.work. All rights reserved.
+          </p>
+          <div className="flex items-center gap-6">
+            {['Privacy Policy', 'Terms of Service', 'Security'].map((link) => (
+              <a
+                key={link}
+                href="#"
+                className="text-white/40 hover:text-white/60 text-sm transition-colors"
+              >
+                {link}
               </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Careers
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Advertise with us
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Terms of Use
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Copyright Policy
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Privacy Policy
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Cookie Policy
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Cookie Preferences
-              </a>
-            </nav>
-          </div>
-          <div className="flex flex-col overflow-hidden items-stretch leading-[1.4] w-60">
-            <div className="text-white text-sm font-bold">Community</div>
-            <nav className="text-xs text-[#bababa] font-normal mt-3">
-              <a href="#" className="block hover:text-white">
-                Manus Community
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Manus for Schools & Teachers
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Manus for Parents
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Manus Scholarships
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Honor Code
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Community Guidelines
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Insights: The Manus Blog
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Become a Volunteer
-              </a>
-            </nav>
-          </div>
-          <div className="flex flex-col overflow-hidden items-stretch leading-[1.4] w-60">
-            <div className="text-white text-sm font-bold">Help</div>
-            <nav className="text-xs text-[#bababa] font-normal mt-3">
-              <a href="#" className="block hover:text-white">
-                Signup
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Help Center
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Safety Center
-              </a>
-              <a href="#" className="block mt-2 hover:text-white">
-                Responsible Disclosure Agreement
-              </a>
-            </nav>
+            ))}
           </div>
         </div>
       </div>

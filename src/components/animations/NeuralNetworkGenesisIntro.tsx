@@ -12,6 +12,7 @@ interface Particle {
 
 export const NeuralNetworkGenesisIntro: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [stage, setStage] = useState<'particles' | 'network' | 'tagline' | 'process' | 'cta' | 'complete'>('particles');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [particles, setParticles] = useState<Particle[]>([]);
   const controls = useAnimation();
 
@@ -51,8 +52,33 @@ export const NeuralNetworkGenesisIntro: React.FC<{ onComplete: () => void }> = (
     timeline();
   }, [onComplete]);
 
+  // Reduced motion fallback
+  if (prefersReducedMotion) {
+    return (
+      <motion.div
+        className="fixed inset-0 z-50 bg-gradient-to-br from-[#0A0E27] via-[#141B34] to-[#0A0E27] flex items-center justify-center"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 1.5, delay: 0.5 }}
+        onAnimationComplete={onComplete}
+      >
+        <img src={geminiLogoGradient} alt="WZRD.work" className="w-32 h-32" />
+      </motion.div>
+    );
+  }
+
   return (
-    <motion.div
+    <>
+      {/* Skip Intro Button */}
+      <button
+        className="fixed top-4 right-4 z-[60] px-4 py-2 bg-white/10 backdrop-blur-md text-white rounded-lg text-sm hover:bg-white/20 transition-colors"
+        onClick={onComplete}
+        aria-label="Skip introduction animation"
+      >
+        Skip Intro →
+      </button>
+
+      <motion.div
       className="fixed inset-0 z-50 bg-gradient-to-br from-[#0A0E27] via-[#141B34] to-[#0A0E27] flex items-center justify-center overflow-hidden"
       initial={{ opacity: 1 }}
       animate={{ opacity: stage === 'complete' ? 0 : 1 }}
