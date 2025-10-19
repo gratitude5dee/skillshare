@@ -10,7 +10,7 @@ export const AudioVisualSynchronizer: React.FC<AudioVisualSynchronizerProps> = (
   phase,
   audioContext
 }) => {
-  const [audioData, setAudioData] = useState<Uint8Array | null>(null);
+  const [audioData, setAudioData] = useState<Uint8Array<ArrayBuffer> | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
@@ -43,8 +43,9 @@ export const AudioVisualSynchronizer: React.FC<AudioVisualSynchronizerProps> = (
     gainNode.connect(analyser);
     analyser.connect(audioContext.destination);
 
-    // Create frequency data array
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    // Create frequency data array with explicit ArrayBuffer type
+    const buffer = new ArrayBuffer(analyser.frequencyBinCount);
+    const dataArray = new Uint8Array(buffer);
     setAudioData(dataArray);
 
     // Generate phase-specific audio
@@ -136,7 +137,10 @@ export const AudioVisualSynchronizer: React.FC<AudioVisualSynchronizerProps> = (
     const analyseAudio = () => {
       if (analyserRef.current && audioData) {
         analyserRef.current.getByteFrequencyData(audioData);
-        setAudioData(new Uint8Array(audioData));
+        const buffer = new ArrayBuffer(audioData.length);
+        const newData = new Uint8Array(buffer);
+        newData.set(audioData);
+        setAudioData(newData);
       }
       
       if (isPlaying) {
