@@ -108,18 +108,34 @@ serve(async (req) => {
   }
 
   try {
+    // Extract JWT token from Authorization header
+    const authHeader = req.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!authHeader) {
+      console.error('[Analysis] Missing Authorization header');
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'UNAUTHORIZED',
+          message: 'Authentication required. Please sign in.'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
+    }
+
+    // Create Supabase client with service role key
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
         },
       }
     );
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    // Verify the JWT and get user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(authHeader);
     
     if (authError || !user) {
       console.error('[Analysis] Authentication failed:', authError);
@@ -127,7 +143,7 @@ serve(async (req) => {
         JSON.stringify({
           success: false,
           error: 'UNAUTHORIZED',
-          message: 'Please log in to analyze recordings',
+          message: 'Invalid or expired authentication token. Please sign in again.',
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

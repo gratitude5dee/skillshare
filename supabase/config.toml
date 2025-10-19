@@ -48,7 +48,7 @@ double_confirm_changes = true
 enable_confirmations = false
 
 [functions.analyze-recording]
-verify_jwt = false
+verify_jwt = true
 
 [functions.analyze-recording.node_compat]
 enabled = true
