@@ -184,7 +184,7 @@ export const ShortFormFactoryPage: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Sparkles className="h-4 w-4" />
-              Powered by Manus AI
+              Powered by Gemini
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground mb-6">
               Turn Any Track Into

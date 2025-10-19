@@ -73,7 +73,7 @@ const Auth: React.FC = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">WZRD.work</CardTitle>
-          <CardDescription>powered by Manus AI</CardDescription>
+          <CardDescription>powered by Gemini</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">

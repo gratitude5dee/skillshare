@@ -33,7 +33,7 @@ export const Dashboard: React.FC = () => {
               <img src={manusLogo} alt="Manus" className="h-10 w-auto" />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">WZRD.work</h1>
-                <p className="text-sm text-muted-foreground">powered by Manus AI</p>
+                <p className="text-sm text-muted-foreground">powered by Gemini</p>
               </div>
             </div>
             

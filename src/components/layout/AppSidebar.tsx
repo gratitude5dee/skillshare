@@ -95,7 +95,7 @@ export function AppSidebar() {
             {!collapsed && (
               <div>
                 <h1 className="text-lg font-bold text-foreground">WZRD.work</h1>
-                <p className="text-xs text-muted-foreground">powered by Manus AI</p>
+                <p className="text-xs text-muted-foreground">powered by Gemini</p>
               </div>
             )}
           </div>

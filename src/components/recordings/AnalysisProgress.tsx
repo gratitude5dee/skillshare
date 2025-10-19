@@ -106,7 +106,7 @@ export function AnalysisProgress({ recordingId }: AnalysisProgressProps) {
           </div>
 
           <div className="text-xs text-muted-foreground">
-            Using Manus AI to identify workflow patterns and create automation scripts.
+            Using Gemini to identify workflow patterns and create automation scripts.
           </div>
         </div>
       </CardContent>

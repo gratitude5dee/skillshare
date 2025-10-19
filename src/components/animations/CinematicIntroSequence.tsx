@@ -145,7 +145,7 @@ export const CinematicIntroSequence: React.FC<CinematicIntroSequenceProps> = ({
               <KineticTypography 
                 phase={currentPhase}
                 primaryText="WZRD.work"
-                secondaryText="powered by Manus AI"
+                secondaryText="powered by Gemini"
               />
 
               {/* Quantum Progress Indicator */}

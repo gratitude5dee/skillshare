@@ -141,7 +141,7 @@ export const KineticTypography: React.FC<KineticTypographyProps> = ({
         </motion.div>
       </div>
 
-      {/* Secondary Text - powered by Manus AI */}
+      {/* Secondary Text - powered by Gemini */}
       <motion.div
         className="relative"
         animate={{

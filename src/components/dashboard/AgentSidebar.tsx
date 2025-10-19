@@ -81,7 +81,7 @@ export const AgentSidebar: React.FC<AgentSidebarProps> = ({ onAgentSelect, onCha
           <img src={manusLogo} alt="Manus" className="h-8 w-auto" />
           <div>
             <h1 className="font-bold text-lg text-sidebar-foreground">WZRD.work</h1>
-            <p className="text-xs text-sidebar-foreground/70">powered by Manus AI</p>
+            <p className="text-xs text-sidebar-foreground/70">powered by Gemini</p>
           </div>
         </div>
       </SidebarHeader>

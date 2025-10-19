@@ -100,7 +100,7 @@ export const IntroSequence: React.FC<IntroSequenceProps> = ({
                 WZRD.work
               </h1>
               <p className="text-muted-foreground text-lg">
-                powered by Manus AI
+                powered by Gemini
               </p>
             </motion.div>
 

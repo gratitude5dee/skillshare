@@ -92,14 +92,14 @@ export const SettingsPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Manus AI API</label>
+              <label className="text-sm font-medium text-muted-foreground">Gemini API</label>
               <div className="mt-1">
                 <Badge variant="default">Connected</Badge>
               </div>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Usage Limits</label>
-              <p className="text-sm text-muted-foreground">Managed by Manus AI platform</p>
+              <p className="text-sm text-muted-foreground">Managed by Gemini platform</p>
             </div>
           </CardContent>
         </Card>

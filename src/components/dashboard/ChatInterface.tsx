@@ -59,7 +59,7 @@ export const ChatInterface: React.FC = () => {
       const taskMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'task',
-        content: `I've created a task for you: "${input.trim()}". The task is now being processed by Manus AI.`,
+        content: `I've created a task for you: "${input.trim()}". The task is now being processed by Gemini.`,
         timestamp: new Date(),
         task
       };

@@ -8,7 +8,7 @@ export const Hero: React.FC = () => {
       <div className="flex w-full flex-col items-center text-center max-md:max-w-full">
         <div className="flex w-[800px] max-w-full flex-col items-center text-5xl text-[#0A0E09] font-black uppercase leading-none max-md:text-[40px]">
           <div className="max-md:text-[40px]">WZRD.work</div>
-          <div className="text-2xl font-light normal-case mt-4 max-md:text-xl">powered by Manus AI</div>
+          <div className="text-2xl font-light normal-case mt-4 max-md:text-xl">powered by Gemini</div>
         </div>
         <div className="mx-auto text-center w-full max-w-[532px] text-lg text-black font-light leading-[25px] mt-4">
           Built for YOU. AI-powered work assistance that transforms your productivity and streamlines your workflow.

@@ -255,7 +255,7 @@ export const QuantumManusLogo: React.FC<QuantumManusLogoProps> = ({
       >
         <img 
           src={manusLogo} 
-          alt="Manus AI Logo" 
+          alt="Gemini Logo" 
           className="w-24 h-24 object-contain"
           style={{
             filter: phase === 'integration' ? 
