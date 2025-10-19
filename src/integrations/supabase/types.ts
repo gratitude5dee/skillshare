@@ -41,6 +41,50 @@ export type Database = {
         }
         Relationships: []
       }
+      api_usage_logs: {
+        Row: {
+          action: string
+          cost_usd: number | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          recording_id: string | null
+          response_time_ms: number | null
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          cost_usd?: number | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          recording_id?: string | null
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          cost_usd?: number | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          recording_id?: string | null
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_logs_recording_id_fkey"
+            columns: ["recording_id"]
+            isOneToOne: false
+            referencedRelation: "screen_recordings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_assets: {
         Row: {
           asset_type: string
@@ -230,23 +274,35 @@ export type Database = {
       }
       profiles: {
         Row: {
+          api_quota_limit: number | null
+          api_quota_remaining: number | null
           avatar_url: string | null
           created_at: string
           id: string
+          quota_reset_at: string | null
+          subscription_tier: string | null
           updated_at: string
           username: string | null
         }
         Insert: {
+          api_quota_limit?: number | null
+          api_quota_remaining?: number | null
           avatar_url?: string | null
           created_at?: string
           id: string
+          quota_reset_at?: string | null
+          subscription_tier?: string | null
           updated_at?: string
           username?: string | null
         }
         Update: {
+          api_quota_limit?: number | null
+          api_quota_remaining?: number | null
           avatar_url?: string | null
           created_at?: string
           id?: string
+          quota_reset_at?: string | null
+          subscription_tier?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -314,6 +370,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      shared_workflows: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_public: boolean | null
+          password_hash: string | null
+          recording_id: string
+          share_token: string
+          shared_by_user_id: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          password_hash?: string | null
+          recording_id: string
+          share_token: string
+          shared_by_user_id: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          password_hash?: string | null
+          recording_id?: string
+          share_token?: string
+          shared_by_user_id?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_workflows_recording_id_fkey"
+            columns: ["recording_id"]
+            isOneToOne: false
+            referencedRelation: "screen_recordings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_analyses: {
         Row: {
@@ -508,7 +611,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      decrement_user_quota: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
+      reset_user_quota: {
+        Args: { user_uuid: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

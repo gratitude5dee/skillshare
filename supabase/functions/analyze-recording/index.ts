@@ -43,6 +43,13 @@ serve(async (req) => {
       }
     );
 
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    
+    if (authError || !user) {
+      throw new Error('Unauthorized: User must be logged in');
+    }
+
     const { recordingId } = await req.json();
 
     if (!recordingId) {
@@ -50,6 +57,23 @@ serve(async (req) => {
     }
 
     console.log(`[Analysis] Starting analysis for recording: ${recordingId}`);
+
+    // Check user quota
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('api_quota_remaining, subscription_tier')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      throw new Error('Failed to fetch user profile');
+    }
+
+    if (profile.api_quota_remaining <= 0) {
+      throw new Error('Monthly analysis quota exceeded. Please upgrade your plan or wait for quota reset.');
+    }
+
+    console.log(`[Analysis] User has ${profile.api_quota_remaining} analyses remaining`);
 
     // Update status to analyzing
     await supabaseClient
@@ -217,6 +241,33 @@ Return ONLY valid JSON in this exact format:
     }
 
     console.log(`[Analysis] Extracted ${analysisResult.steps.length} workflow steps`);
+
+    // Decrement user quota
+    const { error: quotaError } = await supabaseClient.rpc('decrement_user_quota', {
+      user_uuid: user.id
+    });
+
+    if (quotaError) {
+      console.error('[Analysis] Failed to decrement quota:', quotaError);
+    }
+
+    // Log API usage
+    const startTime = Date.now();
+    const processingTime = Date.now() - startTime;
+
+    await supabaseClient
+      .from('api_usage_logs')
+      .insert({
+        user_id: user.id,
+        recording_id: recordingId,
+        action: 'analyze_recording',
+        response_time_ms: processingTime,
+        metadata: {
+          steps_extracted: analysisResult.steps.length,
+          frames_analyzed: analysisResult.framesAnalyzed,
+          complexity_score: analysisResult.complexityScore
+        }
+      });
 
     // Generate comprehensive markdown report
     const formatTime = (ms: number): string => {

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Plus, Play, Pause, Square, Settings, BarChart3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Play, Pause, Square, Settings, BarChart3, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,9 +10,14 @@ import { ActionList } from '@/components/automation/ActionList';
 import { ExecutionViewer } from '@/components/automation/ExecutionViewer';
 import { MetricsOverview } from '@/components/automation/MetricsOverview';
 import { RecordingInterface } from '@/components/automation/RecordingInterface';
+import { UserQuotaCard } from '@/components/dashboard/UserQuotaCard';
+import { UsageStatsCard } from '@/components/dashboard/UsageStatsCard';
 import { useAutomation } from '@/hooks/useAutomation';
+import { useAuth } from '@/hooks/useAuth';
 
 export function AutomationPage() {
+  const navigate = useNavigate();
+  const { user, profile, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('record');
   const { 
     isExecuting, 
@@ -23,8 +29,38 @@ export function AutomationPage() {
     stopExecution
   } = useAutomation();
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [authLoading, user, navigate]);
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col h-full bg-background">
+      {/* User Quota Section */}
+      <div className="border-b border-border bg-card p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-5xl mx-auto">
+          <UserQuotaCard
+            quotaRemaining={profile.api_quota_remaining}
+            quotaLimit={profile.api_quota_limit}
+            subscriptionTier={profile.subscription_tier}
+            quotaResetAt={profile.quota_reset_at}
+          />
+          <UsageStatsCard />
+        </div>
+      </div>
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="flex items-center justify-between p-6">
