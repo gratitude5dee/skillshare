@@ -195,6 +195,7 @@ export type Database = {
           cover_art_url: string | null
           created_at: string
           id: string
+          metadata: Json | null
           platform: string
           source_url: string
           status: string | null
@@ -206,6 +207,7 @@ export type Database = {
           cover_art_url?: string | null
           created_at?: string
           id?: string
+          metadata?: Json | null
           platform: string
           source_url: string
           status?: string | null
@@ -217,6 +219,7 @@ export type Database = {
           cover_art_url?: string | null
           created_at?: string
           id?: string
+          metadata?: Json | null
           platform?: string
           source_url?: string
           status?: string | null
