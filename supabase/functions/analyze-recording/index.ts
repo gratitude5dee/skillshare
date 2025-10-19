@@ -243,7 +243,6 @@ serve(async (req) => {
     }
 
     const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-    const fileManager = new GoogleAIFileManager(GOOGLE_API_KEY);
     
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.0-flash-exp",
@@ -256,20 +255,12 @@ serve(async (req) => {
       },
     });
 
-    // Save video to temporary file
-    const tempFilePath = await Deno.makeTempFile({ suffix: ".webm" });
+    // Convert video to base64 for inline embedding
+    console.log('[Analysis] Converting video to base64...');
     const arrayBuffer = await videoData.arrayBuffer();
-    await Deno.writeFile(tempFilePath, new Uint8Array(arrayBuffer));
+    const base64Video = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     
-    console.log('[Analysis] Uploading video to Gemini File API...');
-
-    // Upload video to Gemini File API
-    const uploadResult = await fileManager.uploadFile(tempFilePath, {
-      mimeType: recording.mime_type || "video/webm",
-      displayName: recording.file_name || `recording-${recordingId}`,
-    });
-
-    console.log(`[Analysis] File uploaded to Gemini: ${uploadResult.file.uri}`);
+    console.log('[Analysis] Video prepared for analysis');
 
     const analysisPrompt = `You are an expert at analyzing screen recordings to extract detailed workflow automation steps.
 
@@ -335,12 +326,12 @@ Do not include any other text, markdown formatting, or explanations outside the 
 
     console.log('[Analysis] Analyzing video with Gemini API...');
 
-    // Send to Gemini using file URI (avoids memory issues with base64)
+    // Send to Gemini using inline base64 data
     const result = await model.generateContent([
       {
-        fileData: {
-          mimeType: uploadResult.file.mimeType,
-          fileUri: uploadResult.file.uri,
+        inlineData: {
+          mimeType: recording.mime_type || "video/webm",
+          data: base64Video,
         },
       },
       { text: analysisPrompt },
@@ -486,21 +477,6 @@ ${step.frameAnalysis ? `**Frame Context**: ${step.frameAnalysis}\n` : ''}
     }
 
     console.log('[Analysis] Analysis completed successfully');
-
-    // Cleanup: Delete temp file and Gemini file
-    try {
-      await Deno.remove(tempFilePath);
-      console.log('[Analysis] Temporary file deleted');
-    } catch (cleanupError) {
-      console.warn('[Analysis] Failed to delete temp file:', cleanupError);
-    }
-
-    try {
-      await fileManager.deleteFile(uploadResult.file.name);
-      console.log('[Analysis] Gemini file deleted');
-    } catch (cleanupError) {
-      console.warn('[Analysis] Failed to delete Gemini file:', cleanupError);
-    }
 
     return new Response(
       JSON.stringify({
