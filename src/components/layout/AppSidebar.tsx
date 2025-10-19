@@ -1,89 +1,26 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
-  Home, 
-  Bot, 
-  MessageSquare, 
-  ListChecks, 
-  Settings,
-  ChevronRight,
-  Sparkles,
-  Video,
-  Menu,
-  User,
-  LogOut,
-  Cpu,
-  Database,
-  Shield
+  Home, Bot, MessageSquare, ListChecks, Settings, ChevronRight,
+  Menu, User, LogOut, Cpu, Database, Shield, BarChart3
 } from 'lucide-react';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-  SidebarTrigger,
-  SidebarFooter,
-  useSidebar,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
+  SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarHeader, SidebarTrigger, SidebarFooter, useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import geminiLogo from '@/assets/gemini-logo.png';
 
 const navigationItems = [
-  {
-    title: 'Dashboard',
-    url: '/dashboard',
-    icon: Home,
-    description: 'Overview and analytics'
-  },
-  {
-    title: 'Automation',
-    url: '/automation',
-    icon: Cpu,
-    description: 'Execute workflows'
-  },
-  {
-    title: 'Recordings',
-    url: '/recordings',
-    icon: Database,
-    description: 'Workflow library'
-  },
-  {
-    title: 'AI Agents',
-    url: '/agents',
-    icon: Bot,
-    description: 'All AI tools & agents'
-  },
-  {
-    title: 'AI Chat',
-    url: '/chat',
-    icon: MessageSquare,
-    description: 'Natural language chat'
-  },
-  {
-    title: 'Tasks',
-    url: '/tasks',
-    icon: ListChecks,
-    description: 'Monitor task progress'
-  },
-  {
-    title: 'Settings',
-    url: '/settings',
-    icon: Settings,
-    description: 'Preferences and configuration'
-  },
-  {
-    title: 'Admin',
-    url: '/admin',
-    icon: Shield,
-    description: 'Platform management',
-    adminOnly: true
-  }
+  { title: 'Dashboard', url: '/dashboard', icon: Home, description: 'Overview' },
+  { title: 'Workflows', url: '/automation', icon: Cpu, description: 'Automation' },
+  { title: 'Recordings', url: '/recordings', icon: Database, description: 'Library' },
+  { title: 'AI Agents', url: '/agents', icon: Bot, description: 'AI tools' },
+  { title: 'Analytics', url: '/tasks', icon: BarChart3, description: 'Metrics' },
+  { title: 'Settings', url: '/settings', icon: Settings, description: 'Config' },
+  { title: 'Admin', url: '/admin', icon: Shield, description: 'Admin', adminOnly: true }
 ];
 
 export function AppSidebar() {
@@ -96,7 +33,6 @@ export function AppSidebar() {
   React.useEffect(() => {
     const checkAdminStatus = async () => {
       if (!user) return;
-      
       try {
         const { supabase } = await import('@/integrations/supabase/client');
         const { data, error } = await supabase.rpc('is_admin');
@@ -105,37 +41,42 @@ export function AppSidebar() {
         console.error('[Sidebar] Failed to check admin status:', error);
       }
     };
-    
     checkAdminStatus();
   }, [user]);
 
-  const isActive = (path: string) => location.pathname === path;
   const visibleItems = navigationItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
-      <SidebarHeader className="border-b border-border">
-        <div className="flex items-center justify-between px-3 py-4">
-          <div className="flex items-center gap-3">
-            <img src={geminiLogo} alt="Gemini" className="h-8 w-auto" />
-            {!collapsed && (
-              <div>
-                <h1 className="text-lg font-bold text-foreground">SkillShare</h1>
-                <p className="text-xs text-muted-foreground">powered by Gemini</p>
+    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible="icon">
+      <SidebarHeader className="border-b border-sidebar-border px-4 py-3">
+        <div className="flex items-center gap-3">
+          {!collapsed && (
+            <>
+              <div className="relative">
+                <img src={geminiLogo} alt="Gemini Logo" className="h-8 w-8 object-contain" />
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full ring-2 ring-sidebar-background" />
               </div>
-            )}
-          </div>
-          <SidebarTrigger className="p-2 hover:bg-muted rounded-md">
-            <Menu className="h-4 w-4" />
-          </SidebarTrigger>
+              <div className="flex flex-col">
+                <span className="font-semibold text-sm">WZRD.work</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  Ready
+                </span>
+              </div>
+            </>
+          )}
+          {collapsed && (
+            <div className="relative mx-auto">
+              <img src={geminiLogo} alt="Gemini Logo" className="h-6 w-6 object-contain" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full ring-1 ring-sidebar-background" />
+            </div>
+          )}
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-            Navigation
-          </SidebarGroupLabel>
+          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {visibleItems.map((item) => (
@@ -144,25 +85,15 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+                        `flex items-center gap-3 px-3 py-2 rounded-md transition-all relative ${
                           isActive
-                            ? 'bg-primary text-primary-foreground'
-                            : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+                            ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-cyan-500 before:rounded-r'
+                            : 'hover:bg-sidebar-accent/50 text-sidebar-foreground'
                         }`
                       }
                     >
                       <item.icon className="h-4 w-4 flex-shrink-0" />
-                      {!collapsed && (
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium">{item.title}</div>
-                          <div className="text-xs text-muted-foreground truncate">
-                            {item.description}
-                          </div>
-                        </div>
-                      )}
-                      {!collapsed && isActive(item.url) && (
-                        <ChevronRight className="h-3 w-3 flex-shrink-0" />
-                      )}
+                      {!collapsed && <span className="flex-1">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -172,31 +103,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border p-3">
-        <div className="space-y-2">
-          {/* User info */}
-          <div className="flex items-center gap-3 px-2 py-2">
-            <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <div className="text-xs text-muted-foreground truncate">
-                  Welcome back, {user?.email?.split('@')[0] || 'User'}
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Sign out button */}
-          <Button 
-            variant="outline" 
-            size={collapsed ? "icon" : "sm"}
-            onClick={signOut}
-            className="w-full justify-start"
-          >
-            <LogOut className="h-4 w-4 flex-shrink-0" />
-            {!collapsed && <span className="ml-2">Sign Out</span>}
-          </Button>
-        </div>
+      <SidebarFooter className="border-t border-sidebar-border p-3">
+        <Button variant="outline" size={collapsed ? "icon" : "sm"} onClick={signOut} className="w-full justify-start">
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span className="ml-2">Sign Out</span>}
+        </Button>
       </SidebarFooter>
     </Sidebar>
   );
