@@ -14,6 +14,217 @@ export type Database = {
   }
   public: {
     Tables: {
+      angle_bank: {
+        Row: {
+          created_at: string
+          difficulty: number | null
+          duration_hint: string | null
+          hook: string
+          id: string
+          sound_fit: number | null
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: number | null
+          duration_hint?: string | null
+          hook: string
+          id?: string
+          sound_fit?: number | null
+        }
+        Update: {
+          created_at?: string
+          difficulty?: number | null
+          duration_hint?: string | null
+          hook?: string
+          id?: string
+          sound_fit?: number | null
+        }
+        Relationships: []
+      }
+      content_assets: {
+        Row: {
+          asset_type: string
+          content_queue_id: string
+          created_at: string
+          file_url: string
+          generation_params: Json | null
+          id: string
+          metadata: Json | null
+          variant: string | null
+        }
+        Insert: {
+          asset_type: string
+          content_queue_id: string
+          created_at?: string
+          file_url: string
+          generation_params?: Json | null
+          id?: string
+          metadata?: Json | null
+          variant?: string | null
+        }
+        Update: {
+          asset_type?: string
+          content_queue_id?: string
+          created_at?: string
+          file_url?: string
+          generation_params?: Json | null
+          id?: string
+          metadata?: Json | null
+          variant?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_assets_content_queue_id_fkey"
+            columns: ["content_queue_id"]
+            isOneToOne: false
+            referencedRelation: "content_queue"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_insights: {
+        Row: {
+          angle_performance: Json | null
+          color_performance: Json | null
+          created_at: string
+          cta_performance: Json | null
+          hook_performance: Json | null
+          id: string
+          music_item_id: string
+          period_end: string
+          period_start: string
+          recommendations: string[] | null
+          summary: string | null
+        }
+        Insert: {
+          angle_performance?: Json | null
+          color_performance?: Json | null
+          created_at?: string
+          cta_performance?: Json | null
+          hook_performance?: Json | null
+          id?: string
+          music_item_id: string
+          period_end: string
+          period_start: string
+          recommendations?: string[] | null
+          summary?: string | null
+        }
+        Update: {
+          angle_performance?: Json | null
+          color_performance?: Json | null
+          created_at?: string
+          cta_performance?: Json | null
+          hook_performance?: Json | null
+          id?: string
+          music_item_id?: string
+          period_end?: string
+          period_start?: string
+          recommendations?: string[] | null
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_insights_music_item_id_fkey"
+            columns: ["music_item_id"]
+            isOneToOne: false
+            referencedRelation: "music_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_queue: {
+        Row: {
+          angle_id: string | null
+          caption: string | null
+          created_at: string
+          cta: string | null
+          day: string
+          hashtags: string[] | null
+          id: string
+          music_item_id: string
+          performance_data: Json | null
+          script: string | null
+          status: string
+        }
+        Insert: {
+          angle_id?: string | null
+          caption?: string | null
+          created_at?: string
+          cta?: string | null
+          day: string
+          hashtags?: string[] | null
+          id?: string
+          music_item_id: string
+          performance_data?: Json | null
+          script?: string | null
+          status?: string
+        }
+        Update: {
+          angle_id?: string | null
+          caption?: string | null
+          created_at?: string
+          cta?: string | null
+          day?: string
+          hashtags?: string[] | null
+          id?: string
+          music_item_id?: string
+          performance_data?: Json | null
+          script?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_queue_angle_id_fkey"
+            columns: ["angle_id"]
+            isOneToOne: false
+            referencedRelation: "angle_bank"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_queue_music_item_id_fkey"
+            columns: ["music_item_id"]
+            isOneToOne: false
+            referencedRelation: "music_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_items: {
+        Row: {
+          artists: string[] | null
+          cover_art_url: string | null
+          created_at: string
+          id: string
+          platform: string
+          source_url: string
+          status: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          artists?: string[] | null
+          cover_art_url?: string | null
+          created_at?: string
+          id?: string
+          platform: string
+          source_url: string
+          status?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          artists?: string[] | null
+          cover_art_url?: string | null
+          created_at?: string
+          id?: string
+          platform?: string
+          source_url?: string
+          status?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -37,6 +248,130 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      screen_recordings: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          raw_data: Json | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          raw_data?: Json | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          raw_data?: Json | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workflow_actions: {
+        Row: {
+          action_data: Json | null
+          action_type: string
+          checkpoint_config: Json | null
+          confidence_score: number | null
+          created_at: string
+          description: string | null
+          estimated_time_seconds: number | null
+          id: string
+          instructions: string
+          name: string
+          order_index: number
+          understanding_id: string
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type: string
+          checkpoint_config?: Json | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_time_seconds?: number | null
+          id?: string
+          instructions: string
+          name: string
+          order_index?: number
+          understanding_id: string
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string
+          checkpoint_config?: Json | null
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_time_seconds?: number | null
+          id?: string
+          instructions?: string
+          name?: string
+          order_index?: number
+          understanding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_actions_understanding_id_fkey"
+            columns: ["understanding_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_understandings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_understandings: {
+        Row: {
+          created_at: string
+          id: string
+          recording_id: string
+          understanding_data: Json | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recording_id: string
+          understanding_data?: Json | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recording_id?: string
+          understanding_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_understandings_recording_id_fkey"
+            columns: ["recording_id"]
+            isOneToOne: false
+            referencedRelation: "screen_recordings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
