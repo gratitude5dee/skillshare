@@ -50,6 +50,9 @@ enable_confirmations = false
 [functions.analyze-recording]
 verify_jwt = false
 
+[functions.analyze-recording.node_compat]
+enabled = true
+
 [functions.execute-automation]
 verify_jwt = false
 

@@ -254,9 +254,14 @@ export type Database = {
       }
       screen_recordings: {
         Row: {
+          analysis_data: Json | null
+          analysis_markdown: string | null
+          analysis_status: string | null
+          analyzed_at: string | null
           created_at: string
           description: string | null
           duration: number | null
+          file_name: string | null
           file_size: number | null
           file_url: string | null
           id: string
@@ -269,9 +274,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          analysis_data?: Json | null
+          analysis_markdown?: string | null
+          analysis_status?: string | null
+          analyzed_at?: string | null
           created_at?: string
           description?: string | null
           duration?: number | null
+          file_name?: string | null
           file_size?: number | null
           file_url?: string | null
           id?: string
@@ -284,9 +294,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          analysis_data?: Json | null
+          analysis_markdown?: string | null
+          analysis_status?: string | null
+          analyzed_at?: string | null
           created_at?: string
           description?: string | null
           duration?: number | null
+          file_name?: string | null
           file_size?: number | null
           file_url?: string | null
           id?: string

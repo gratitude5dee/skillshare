@@ -118,11 +118,13 @@ export function useRecordings() {
           title: metadata.title,
           description: metadata.description,
           file_url: fileUrl,
+          file_name: file.name,
           file_size: file.size,
           storage_type: useInlineStorage ? 'local' : 'supabase',
           mime_type: file.type || 'video/webm',
           raw_data: rawData,
-          status: 'pending'
+          status: 'pending',
+          analysis_status: 'pending'
         }])
         .select()
         .single();

@@ -30,11 +30,6 @@ export function RecordingInterface() {
     };
   }, [isRecording]);
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const startRecording = async () => {
     try {
@@ -91,34 +86,118 @@ export function RecordingInterface() {
       });
     }, 300);
 
-    setTimeout(() => {
-      setProcessingState('analyzing');
+    try {
+      // First upload the recording
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
       
-      setTimeout(() => {
-        const mockAnalysis = {
-          duration: 45,
-          framesAnalyzed: 450,
-          steps: [
-            { id: 1, timestamp: '00:03', action: 'Click on "Automation" in navigation', confidence: 0.95 },
-            { id: 2, timestamp: '00:08', action: 'Select "Execute workflows" option', confidence: 0.92 },
-            { id: 3, timestamp: '00:15', action: 'Click "Available Actions" panel', confidence: 0.88 },
-            { id: 4, timestamp: '00:22', action: 'Upload screen recording file', confidence: 0.94 },
-            { id: 5, timestamp: '00:30', action: 'Configure automation settings', confidence: 0.89 },
-            { id: 6, timestamp: '00:38', action: 'Click "Start" button', confidence: 0.96 }
-          ],
-          insights: {
-            totalActions: 6,
-            averageStepDuration: 7.5,
-            complexity: 'Medium',
-            uiElements: 12
-          }
-        };
+      if (!user) throw new Error('User not authenticated');
+
+      // Convert blob to base64 for inline storage (if <20MB)
+      const fileSize = recordedVideo.size;
+      let videoData = null;
+      let storageType = 'local';
+      let fileUrl = null;
+
+      if (fileSize > 20_000_000) {
+        // Upload to Supabase Storage for large files
+        const fileName = `${user.id}/${Date.now()}.webm`;
+        const { data, error } = await supabase.storage
+          .from('screen-recordings')
+          .upload(fileName, recordedVideo.blob);
+
+        if (error) throw error;
         
-        setVideoAnalysis(mockAnalysis);
-        setExtractedSteps(mockAnalysis.steps);
-        setProcessingState('complete');
-      }, 3000);
-    }, 3500);
+        fileUrl = fileName;
+        storageType = 'supabase';
+      } else {
+        // Store inline for small files
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve) => {
+          reader.onloadend = () => {
+            const base64 = (reader.result as string).split(',')[1];
+            resolve(base64);
+          };
+          reader.readAsDataURL(recordedVideo.blob);
+        });
+        
+        const base64Data = await base64Promise;
+        videoData = { video_data: base64Data };
+      }
+
+      // Insert recording into database
+      const { data: recording, error: insertError } = await supabase
+        .from('screen_recordings')
+        .insert({
+          user_id: user.id,
+          title: 'Screen Recording',
+          description: 'Automated workflow capture',
+          file_url: fileUrl,
+          file_size: fileSize,
+          mime_type: 'video/webm',
+          storage_type: storageType,
+          raw_data: videoData,
+          analysis_status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (insertError || !recording) throw insertError || new Error('Failed to create recording');
+
+      clearInterval(uploadInterval);
+      setUploadProgress(100);
+      setProcessingState('analyzing');
+
+      // Call the analyze-recording edge function
+      const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-recording', {
+        body: { recordingId: recording.id }
+      });
+
+      if (analysisError) throw analysisError;
+
+      // Fetch the updated recording with analysis results
+      const { data: updatedRecording, error: fetchError } = await supabase
+        .from('screen_recordings')
+        .select('*')
+        .eq('id', recording.id)
+        .single();
+
+      if (fetchError || !updatedRecording) throw fetchError || new Error('Failed to fetch analysis');
+
+      const analysis = updatedRecording.analysis_data as any;
+      
+      setVideoAnalysis({
+        duration: analysis.totalDuration,
+        framesAnalyzed: analysis.framesAnalyzed,
+        steps: analysis.steps,
+        insights: {
+          totalActions: analysis.steps.length,
+          averageStepDuration: analysis.totalDuration / analysis.steps.length,
+          complexity: analysis.complexityScore > 0.7 ? 'High' : analysis.complexityScore > 0.4 ? 'Medium' : 'Low',
+          uiElements: analysis.detectedUIElements
+        }
+      });
+      
+      setExtractedSteps(analysis.steps.map((step: any, idx: number) => ({
+        id: idx + 1,
+        timestamp: formatTime(step.timestampMs),
+        action: step.actionDescription,
+        confidence: step.confidenceScore
+      })));
+      
+      setProcessingState('complete');
+    } catch (error) {
+      console.error('Processing error:', error);
+      setProcessingState('idle');
+      alert('Failed to process video. Please try again.');
+    }
+  };
+
+  const formatTime = (ms: number): string => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

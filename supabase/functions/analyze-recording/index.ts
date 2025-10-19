@@ -1,112 +1,131 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.21.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const STORAGE_THRESHOLD = 20_000_000; // 20MB in bytes
+interface VideoAnalysisResult {
+  totalDuration: number;
+  framesAnalyzed: number;
+  complexityScore: number;
+  detectedUIElements: number;
+  workflowSummary: string;
+  steps: Array<{
+    stepNumber: number;
+    timestampMs: number;
+    actionType: string;
+    actionDescription: string;
+    targetElement: string;
+    coordinates?: { x: number; y: number; width: number; height: number };
+    confidenceScore: number;
+    frameAnalysis: string;
+  }>;
+}
 
 serve(async (req) => {
+  // Handle CORS
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const supabase = createClient(
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
     );
 
     const { recordingId } = await req.json();
 
     if (!recordingId) {
-      return new Response(
-        JSON.stringify({ error: 'recordingId is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('Recording ID is required');
     }
 
     console.log(`[Analysis] Starting analysis for recording: ${recordingId}`);
 
-    // Fetch recording metadata
-    const { data: recording, error: recordingError } = await supabase
+    // Update status to analyzing
+    await supabaseClient
+      .from('screen_recordings')
+      .update({ 
+        analysis_status: 'analyzing',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', recordingId);
+
+    // Fetch recording data
+    const { data: recording, error: fetchError } = await supabaseClient
       .from('screen_recordings')
       .select('*')
       .eq('id', recordingId)
       .single();
 
-    if (recordingError || !recording) {
-      console.error('[Analysis] Recording not found:', recordingError);
-      return new Response(
-        JSON.stringify({ error: 'Recording not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (fetchError || !recording) {
+      throw new Error('Recording not found');
     }
 
-    // Create analysis record
-    const { data: analysis, error: analysisError } = await supabase
-      .from('video_analyses')
-      .insert({
-        recording_id: recordingId,
-        status: 'processing'
-      })
-      .select()
-      .single();
+    console.log(`[Analysis] Recording found: ${recording.title}`);
 
-    if (analysisError) {
-      console.error('[Analysis] Failed to create analysis record:', analysisError);
-      throw analysisError;
-    }
-
-    console.log(`[Analysis] Created analysis record: ${analysis.id}`);
-
-    // Download video based on storage type
+    // Download video data
     let videoData: Blob;
     
     if (recording.storage_type === 'supabase' && recording.file_url) {
-      // Download from Supabase Storage (>20MB files)
-      const storagePath = recording.file_url.split('/').slice(-2).join('/');
-      console.log(`[Analysis] Downloading from storage: ${storagePath}`);
-      
-      const { data, error } = await supabase.storage
-        .from('recordings')
-        .download(storagePath);
-      
-      if (error || !data) {
-        throw new Error(`Failed to download video: ${error?.message}`);
+      // Download from Supabase Storage
+      console.log(`[Analysis] Downloading from storage: ${recording.file_url}`);
+      const { data, error } = await supabaseClient.storage
+        .from('screen-recordings')
+        .download(recording.file_url);
+
+      if (error) {
+        throw new Error(`Failed to download video: ${error.message}`);
       }
       videoData = data;
     } else if (recording.storage_type === 'local' && recording.raw_data?.video_data) {
-      // Retrieve inline data (≤20MB files)
+      // Use inline video data for small files (<20MB)
       console.log(`[Analysis] Using inline video data`);
       const base64Data = recording.raw_data.video_data;
       const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
       videoData = new Blob([binaryData], { type: recording.mime_type || 'video/webm' });
     } else {
-      throw new Error('Invalid storage configuration - no valid video data source');
+      throw new Error('No valid video data source found');
     }
 
-    console.log(`[Analysis] Downloaded video: ${videoData.size} bytes`);
+    console.log(`[Analysis] Video loaded: ${videoData.size} bytes`);
 
-    // Convert Blob to base64 for Gemini
+    // Initialize Gemini API
+    const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY');
+    if (!GOOGLE_API_KEY) {
+      throw new Error('GOOGLE_API_KEY not configured');
+    }
+
+    const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash-exp",
+      generationConfig: {
+        temperature: 0.4,
+        topK: 32,
+        topP: 1,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+      },
+    });
+
+    // Convert video to base64 for inline data
     const arrayBuffer = await videoData.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
     const base64Video = btoa(
-      new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+      bytes.reduce((data, byte) => data + String.fromCharCode(byte), '')
     );
 
-    // Analyze with Lovable AI (Gemini)
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
+    const analysisPrompt = `You are an expert at analyzing screen recordings to extract detailed workflow automation steps.
 
-    const analysisPrompt = `
-You are an expert at analyzing screen recordings to extract detailed workflow automation steps.
-
-Analyze this screen recording video frame-by-frame at 1 FPS.
+Analyze this screen recording video carefully. Process it at 1 FPS to capture all user interactions.
 
 For EACH significant user action detected, provide:
 
@@ -114,236 +133,116 @@ For EACH significant user action detected, provide:
 2. **timestampMs**: Exact timestamp in milliseconds when action occurred
 3. **actionType**: One of: click, doubleClick, rightClick, type, navigate, scroll, select, drag, hover, keyPress
 4. **actionDescription**: Clear, detailed description of what the user did
-5. **targetElement**: Description of the UI element
+5. **targetElement**: Description of the UI element interacted with
 6. **coordinates**: If visible, provide {x, y, width, height} in pixels
 7. **confidenceScore**: Your confidence in this detection (0.0 to 1.0)
-8. **frameAnalysis**: Brief description of what's visible
+8. **frameAnalysis**: Brief description of what's visible in the frame
 
 Also provide overall metrics:
 - **totalDuration**: Total video length in seconds
 - **framesAnalyzed**: Total frames examined
 - **complexityScore**: 0.0 to 1.0 rating of workflow complexity
 - **detectedUIElements**: Count of unique UI elements identified
-- **workflowSummary**: 2-3 sentence summary
+- **workflowSummary**: 2-3 sentence summary of the workflow
 
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON in this exact format:
 {
   "totalDuration": 120,
   "framesAnalyzed": 120,
   "complexityScore": 0.65,
   "detectedUIElements": 15,
-  "workflowSummary": "User navigated to automation hub...",
+  "workflowSummary": "User navigated through the automation interface...",
   "steps": [
     {
       "stepNumber": 1,
       "timestampMs": 3000,
       "actionType": "click",
-      "actionDescription": "Clicked on menu item",
-      "targetElement": "Navigation menu item",
+      "actionDescription": "Clicked on the navigation menu",
+      "targetElement": "Menu button in top navigation",
       "coordinates": { "x": 27, "y": 224, "width": 120, "height": 40 },
       "confidenceScore": 0.95,
-      "frameAnalysis": "Dashboard view visible"
+      "frameAnalysis": "Dashboard view with navigation bar visible"
     }
   ]
 }`;
 
-    console.log('[Analysis] Sending to Lovable AI...');
-    
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: analysisPrompt },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:${recording.mime_type || 'video/webm'};base64,${base64Video}`
-                }
-              }
-            ]
-          }
-        ],
-        response_format: { type: 'json_object' }
-      })
-    });
+    console.log('[Analysis] Sending video to Gemini API...');
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error('[Analysis] AI Gateway error:', aiResponse.status, errorText);
-      
-      if (aiResponse.status === 429) {
-        throw new Error('Rate limit exceeded. Please try again later.');
-      }
-      if (aiResponse.status === 402) {
-        throw new Error('AI credits exhausted. Please add funds to your workspace.');
-      }
-      throw new Error(`AI analysis failed: ${errorText}`);
-    }
-
-    const aiResult = await aiResponse.json();
-    const responseText = aiResult.choices?.[0]?.message?.content;
-
-    if (!responseText) {
-      throw new Error('No response from AI');
-    }
-
-    console.log('[Analysis] AI response received, parsing...');
-
-    // Parse JSON response
-    let analysisData;
-    try {
-      // Handle markdown code blocks
-      let jsonText = responseText;
-      if (responseText.includes('```json')) {
-        jsonText = responseText.split('```json')[1].split('```')[0].trim();
-      } else if (responseText.includes('```')) {
-        jsonText = responseText.split('```')[1].split('```')[0].trim();
-      }
-      analysisData = JSON.parse(jsonText);
-    } catch (e) {
-      console.error('[Analysis] Failed to parse AI response:', e);
-      throw new Error('Failed to parse AI response');
-    }
-
-    console.log(`[Analysis] Extracted ${analysisData.steps?.length || 0} steps`);
-
-    // Save workflow steps
-    if (analysisData.steps && analysisData.steps.length > 0) {
-      const steps = analysisData.steps.map((step: any) => ({
-        analysis_id: analysis.id,
-        step_number: step.stepNumber,
-        timestamp_ms: step.timestampMs,
-        action_type: step.actionType,
-        action_description: step.actionDescription,
-        target_element: step.targetElement,
-        coordinates: step.coordinates,
-        confidence_score: step.confidenceScore,
-        metadata: {
-          frameAnalysis: step.frameAnalysis
-        }
-      }));
-
-      const { error: stepsError } = await supabase
-        .from('workflow_steps')
-        .insert(steps);
-
-      if (stepsError) {
-        console.error('[Analysis] Failed to save steps:', stepsError);
-        throw stepsError;
-      }
-    }
-
-    // Generate markdown
-    const markdown = generateMarkdown(analysisData, recording);
-    const markdownPath = `${recording.user_id}/${recordingId}/videounderstanding.md`;
-    
-    const { error: markdownError } = await supabase.storage
-      .from('analysis-artifacts')
-      .upload(markdownPath, markdown, {
-        contentType: 'text/markdown',
-        upsert: true
-      });
-
-    if (markdownError) {
-      console.warn('[Analysis] Failed to save markdown:', markdownError);
-    }
-
-    // Update analysis record
-    const { error: updateError } = await supabase
-      .from('video_analyses')
-      .update({
-        total_frames: analysisData.framesAnalyzed,
-        frames_analyzed: analysisData.framesAnalyzed,
-        complexity_score: analysisData.complexityScore,
-        markdown_path: markdownPath,
-        status: 'completed',
-        completed_at: new Date().toISOString()
-      })
-      .eq('id', analysis.id);
-
-    if (updateError) {
-      console.error('[Analysis] Failed to update analysis:', updateError);
-      throw updateError;
-    }
-
-    console.log('[Analysis] Analysis completed successfully');
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        analysisId: analysis.id,
-        stepsCount: analysisData.steps?.length || 0,
-        markdownPath
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
-  } catch (error) {
-    console.error('[Analysis] Error:', error);
-    
-    const errorMessage = error instanceof Error ? error.message : 'Analysis failed';
-    const errorDetails = error instanceof Error ? error.toString() : String(error);
-    
-    return new Response(
-      JSON.stringify({
-        error: errorMessage,
-        details: errorDetails
-      }),
+    // Send to Gemini with proper video format
+    const result = await model.generateContent([
       {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
-  }
-});
+        inlineData: {
+          mimeType: recording.mime_type || "video/webm",
+          data: base64Video,
+        },
+      },
+      { text: analysisPrompt },
+    ]);
 
-// Helper function to generate markdown
-function generateMarkdown(result: any, recording: any): string {
-  const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
+    const response = await result.response;
+    const analysisText = response.text();
+    
+    console.log('[Analysis] Received response from Gemini');
 
-  return `# Video Workflow Analysis Report
+    // Parse the JSON response
+    let analysisResult: VideoAnalysisResult;
+    try {
+      // Remove markdown code blocks if present
+      const cleanedText = analysisText
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+      
+      analysisResult = JSON.parse(cleanedText);
+    } catch (parseError) {
+      console.error('[Analysis] Failed to parse JSON:', analysisText);
+      const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown parsing error';
+      throw new Error(`Failed to parse AI response: ${errorMsg}`);
+    }
 
-## 📊 Metadata
+    // Validate the analysis result
+    if (!analysisResult.steps || !Array.isArray(analysisResult.steps)) {
+      throw new Error('Invalid analysis result: missing steps array');
+    }
 
-| Property | Value |
-|----------|-------|
-| **Recording ID** | \`${recording.id}\` |
-| **Title** | ${recording.title || 'Untitled'} |
-| **Analysis Date** | ${new Date().toISOString()} |
-| **Total Duration** | ${result.totalDuration}s |
-| **Frames Analyzed** | ${result.framesAnalyzed} frames @ 1 FPS |
-| **Complexity Score** | ${(result.complexityScore * 100).toFixed(0)}% |
+    console.log(`[Analysis] Extracted ${analysisResult.steps.length} workflow steps`);
+
+    // Generate comprehensive markdown report
+    const formatTime = (ms: number): string => {
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const markdownReport = `# 🎬 Workflow Analysis Report
+
+**Recording:** ${recording.title}  
+**Analyzed:** ${new Date().toLocaleString()}  
+**Duration:** ${analysisResult.totalDuration}s  
 
 ---
 
-## 📝 Executive Summary
+## 📊 Analysis Summary
 
-${result.workflowSummary}
+${analysisResult.workflowSummary}
 
-### Key Metrics
+### Metrics
 
-- **Total Actions Detected**: ${result.steps?.length || 0}
-- **UI Elements Identified**: ${result.detectedUIElements}
-- **Average Confidence**: ${result.steps?.length ? (result.steps.reduce((sum: number, s: any) => sum + s.confidenceScore, 0) / result.steps.length * 100).toFixed(1) : 0}%
+| Metric | Value |
+|--------|-------|
+| **Total Duration** | ${analysisResult.totalDuration} seconds |
+| **Frames Analyzed** | ${analysisResult.framesAnalyzed} |
+| **Complexity Score** | ${(analysisResult.complexityScore * 100).toFixed(1)}% |
+| **UI Elements Detected** | ${analysisResult.detectedUIElements} |
+| **Total Steps** | ${analysisResult.steps.length} |
+| **Average Confidence** | ${analysisResult.steps.length > 0 ? (analysisResult.steps.reduce((sum, s) => sum + s.confidenceScore, 0) / analysisResult.steps.length * 100).toFixed(1) : 0}% |
 
 ---
 
 ## 🔄 Workflow Steps
 
-${result.steps?.map((step: any) => `
+${analysisResult.steps.map((step) => `
 ### Step ${step.stepNumber}: ${step.actionDescription}
 
 | Attribute | Value |
@@ -357,10 +256,58 @@ ${step.coordinates ? `| **Position** | X: ${step.coordinates.x}px, Y: ${step.coo
 ${step.frameAnalysis ? `**Frame Context**: ${step.frameAnalysis}\n` : ''}
 
 ---
-`).join('\n') || 'No steps detected'}
+`).join('\n')}
 
 ---
 
-*Generated by SkillShare Automation Hub - Powered by Gemini AI*
+*Generated by SkillShare Automation Hub - Powered by Gemini 2.0 Flash*
 `;
-}
+
+    // Update database with analysis results
+    const { error: updateError } = await supabaseClient
+      .from('screen_recordings')
+      .update({
+        analysis_status: 'completed',
+        analyzed_at: new Date().toISOString(),
+        analysis_data: analysisResult,
+        analysis_markdown: markdownReport,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', recordingId);
+
+    if (updateError) {
+      throw new Error(`Failed to update recording: ${updateError.message}`);
+    }
+
+    console.log('[Analysis] Analysis completed successfully');
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        recordingId,
+        analysis: analysisResult,
+        markdown: markdownReport,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
+
+  } catch (error) {
+    console.error('[Analysis] Error:', error);
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: errorMessage,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    );
+  }
+});
