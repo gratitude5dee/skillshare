@@ -89,9 +89,12 @@ export function RecordingInterface() {
     try {
       // First upload the recording
       const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { session } } = await supabase.auth.getSession();
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) throw new Error('User not authenticated');
+      if (!user || !session) {
+        throw new Error('You must be logged in to analyze recordings. Please sign in and try again.');
+      }
 
       // Always use Supabase Storage to avoid database timeouts
       const fileSize = recordedVideo.size;
@@ -145,12 +148,18 @@ export function RecordingInterface() {
       setUploadProgress(100);
       setProcessingState('analyzing');
 
-      // Call the analyze-recording edge function
+      // Call the analyze-recording edge function with explicit auth header
       const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-recording', {
-        body: { recordingId: recording.id }
+        body: { recordingId: recording.id },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
-      if (analysisError) throw analysisError;
+      if (analysisError) {
+        console.error('[Analysis] Edge function error:', analysisError);
+        throw new Error(analysisError.message || 'Failed to analyze recording');
+      }
 
       // Fetch the updated recording with analysis results
       const { data: updatedRecording, error: fetchError } = await supabase
@@ -190,7 +199,19 @@ export function RecordingInterface() {
       setUploadProgress(0);
       
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      alert(`Failed to process video: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
+      
+      // Provide specific error messages based on error type
+      if (errorMessage.includes('logged in') || errorMessage.includes('Unauthorized')) {
+        alert('Authentication Error: Please sign in to analyze recordings.\n\nYou will be redirected to the login page.');
+        window.location.href = '/auth';
+      } else if (errorMessage.includes('quota exceeded')) {
+        alert('Quota Exceeded: You have used all your monthly analyses.\n\nPlease upgrade your plan or wait for quota reset.');
+      } else if (errorMessage.includes('session expired')) {
+        alert('Session Expired: Your login session has expired.\n\nPlease sign in again.');
+        window.location.href = '/auth';
+      } else {
+        alert(`Failed to process video: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
+      }
     }
   };
 

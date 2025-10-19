@@ -47,7 +47,18 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     
     if (authError || !user) {
-      throw new Error('Unauthorized: User must be logged in');
+      console.error('[Analysis] Authentication failed:', authError);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'UNAUTHORIZED',
+          message: 'Please log in to analyze recordings',
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401,
+        }
+      );
     }
 
     const { recordingId } = await req.json();
@@ -70,7 +81,18 @@ serve(async (req) => {
     }
 
     if (profile.api_quota_remaining <= 0) {
-      throw new Error('Monthly analysis quota exceeded. Please upgrade your plan or wait for quota reset.');
+      console.error('[Analysis] Quota exceeded for user:', user.id);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'QUOTA_EXCEEDED',
+          message: 'Monthly analysis quota exceeded. Please upgrade your plan or wait for quota reset.',
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 429,
+        }
+      );
     }
 
     console.log(`[Analysis] User has ${profile.api_quota_remaining} analyses remaining`);
