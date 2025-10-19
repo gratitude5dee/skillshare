@@ -175,11 +175,47 @@ export function useRecordings() {
     }
   };
 
+  const analyzeRecording = async (recordingId: string) => {
+    try {
+      toast({
+        title: "Starting analysis",
+        description: "Your video is being analyzed by AI...",
+      });
+
+      const { data, error } = await supabase.functions.invoke('analyze-recording', {
+        body: { recordingId }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Analysis started",
+        description: `Analyzing video... (${data.stepsCount} steps detected)`,
+      });
+
+      // Reload recordings to get updated analysis status
+      await loadRecordings();
+
+      return data;
+    } catch (error) {
+      console.error('Analysis error:', error);
+      toast({
+        title: "Analysis failed",
+        description: error.message || "Could not analyze the recording.",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   return {
     recordings,
     isLoading,
     uploadRecording,
     deleteRecording,
+    analyzeRecording,
     loadRecordings
   };
 }

@@ -253,12 +253,14 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
-          duration_seconds: number | null
+          duration: number | null
           file_size: number | null
           file_url: string | null
           id: string
+          mime_type: string | null
           raw_data: Json | null
           status: string
+          storage_type: string | null
           title: string
           updated_at: string
           user_id: string
@@ -266,12 +268,14 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
-          duration_seconds?: number | null
+          duration?: number | null
           file_size?: number | null
           file_url?: string | null
           id?: string
+          mime_type?: string | null
           raw_data?: Json | null
           status?: string
+          storage_type?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -279,17 +283,72 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
-          duration_seconds?: number | null
+          duration?: number | null
           file_size?: number | null
           file_url?: string | null
           id?: string
+          mime_type?: string | null
           raw_data?: Json | null
           status?: string
+          storage_type?: string | null
           title?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      video_analyses: {
+        Row: {
+          analysis_duration: number | null
+          completed_at: string | null
+          complexity_score: number | null
+          created_at: string
+          error_message: string | null
+          frames_analyzed: number | null
+          gemini_file_id: string | null
+          id: string
+          markdown_path: string | null
+          recording_id: string
+          status: string | null
+          total_frames: number | null
+        }
+        Insert: {
+          analysis_duration?: number | null
+          completed_at?: string | null
+          complexity_score?: number | null
+          created_at?: string
+          error_message?: string | null
+          frames_analyzed?: number | null
+          gemini_file_id?: string | null
+          id?: string
+          markdown_path?: string | null
+          recording_id: string
+          status?: string | null
+          total_frames?: number | null
+        }
+        Update: {
+          analysis_duration?: number | null
+          completed_at?: string | null
+          complexity_score?: number | null
+          created_at?: string
+          error_message?: string | null
+          frames_analyzed?: number | null
+          gemini_file_id?: string | null
+          id?: string
+          markdown_path?: string | null
+          recording_id?: string
+          status?: string | null
+          total_frames?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_analyses_recording_id_fkey"
+            columns: ["recording_id"]
+            isOneToOne: false
+            referencedRelation: "screen_recordings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       workflow_actions: {
         Row: {
@@ -340,6 +399,59 @@ export type Database = {
             columns: ["understanding_id"]
             isOneToOne: false
             referencedRelation: "workflow_understandings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_steps: {
+        Row: {
+          action_description: string
+          action_type: string
+          analysis_id: string
+          confidence_score: number | null
+          coordinates: Json | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          screenshot_path: string | null
+          step_number: number
+          target_element: string | null
+          timestamp_ms: number
+        }
+        Insert: {
+          action_description: string
+          action_type: string
+          analysis_id: string
+          confidence_score?: number | null
+          coordinates?: Json | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          screenshot_path?: string | null
+          step_number: number
+          target_element?: string | null
+          timestamp_ms: number
+        }
+        Update: {
+          action_description?: string
+          action_type?: string
+          analysis_id?: string
+          confidence_score?: number | null
+          coordinates?: Json | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          screenshot_path?: string | null
+          step_number?: number
+          target_element?: string | null
+          timestamp_ms?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_steps_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "video_analyses"
             referencedColumns: ["id"]
           },
         ]
