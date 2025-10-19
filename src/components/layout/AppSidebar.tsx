@@ -13,7 +13,8 @@ import {
   User,
   LogOut,
   Cpu,
-  Database
+  Database,
+  Shield
 } from 'lucide-react';
 import {
   Sidebar,
@@ -75,6 +76,13 @@ const navigationItems = [
     url: '/settings',
     icon: Settings,
     description: 'Preferences and configuration'
+  },
+  {
+    title: 'Admin',
+    url: '/admin',
+    icon: Shield,
+    description: 'Platform management',
+    adminOnly: true
   }
 ];
 
@@ -83,8 +91,26 @@ export function AppSidebar() {
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const { signOut, user } = useAuth();
+  const [isAdmin, setIsAdmin] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) return;
+      
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data, error } = await supabase.rpc('is_admin');
+        if (!error) setIsAdmin(!!data);
+      } catch (error) {
+        console.error('[Sidebar] Failed to check admin status:', error);
+      }
+    };
+    
+    checkAdminStatus();
+  }, [user]);
 
   const isActive = (path: string) => location.pathname === path;
+  const visibleItems = navigationItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
@@ -112,7 +138,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => (
+              {visibleItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink

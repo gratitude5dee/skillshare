@@ -16,6 +16,7 @@ import TasksPage from "./pages/TasksPage";
 import SettingsPage from "./pages/SettingsPage";
 import { AutomationPage } from "./pages/AutomationPage";
 import { RecordingsPage } from "./pages/RecordingsPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/automation" element={<AutomationPage />} />
               <Route path="/recordings" element={<RecordingsPage />} />
+              <Route path="/admin" element={<AdminPage />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
