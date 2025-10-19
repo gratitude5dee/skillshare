@@ -93,37 +93,25 @@ export function RecordingInterface() {
       
       if (!user) throw new Error('User not authenticated');
 
-      // Convert blob to base64 for inline storage (if <20MB)
+      // Always use Supabase Storage to avoid database timeouts
       const fileSize = recordedVideo.size;
-      let videoData = null;
-      let storageType = 'local';
-      let fileUrl = null;
-
-      if (fileSize > 20_000_000) {
-        // Upload to Supabase Storage for large files
-        const fileName = `${user.id}/${Date.now()}.webm`;
-        const { data, error } = await supabase.storage
-          .from('screen-recordings')
-          .upload(fileName, recordedVideo.blob);
-
-        if (error) throw error;
-        
-        fileUrl = fileName;
-        storageType = 'supabase';
-      } else {
-        // Store inline for small files
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve) => {
-          reader.onloadend = () => {
-            const base64 = (reader.result as string).split(',')[1];
-            resolve(base64);
-          };
-          reader.readAsDataURL(recordedVideo.blob);
+      const fileName = `${user.id}/${Date.now()}.webm`;
+      
+      console.log(`[Upload] Uploading ${(fileSize / 1024 / 1024).toFixed(2)}MB to storage...`);
+      
+      const { data, error: storageError } = await supabase.storage
+        .from('screen-recordings')
+        .upload(fileName, recordedVideo.blob, {
+          contentType: 'video/webm',
+          cacheControl: '3600'
         });
-        
-        const base64Data = await base64Promise;
-        videoData = { video_data: base64Data };
+
+      if (storageError) {
+        console.error('[Upload] Storage error:', storageError);
+        throw new Error(`Failed to upload video: ${storageError.message}`);
       }
+      
+      console.log('[Upload] File uploaded successfully:', fileName);
 
       // Insert recording into database
       const { data: recording, error: insertError } = await supabase
@@ -132,17 +120,26 @@ export function RecordingInterface() {
           user_id: user.id,
           title: 'Screen Recording',
           description: 'Automated workflow capture',
-          file_url: fileUrl,
+          file_url: fileName,
+          file_name: `recording-${Date.now()}.webm`,
           file_size: fileSize,
           mime_type: 'video/webm',
-          storage_type: storageType,
-          raw_data: videoData,
+          storage_type: 'supabase',
           analysis_status: 'pending'
         })
         .select()
         .single();
 
-      if (insertError || !recording) throw insertError || new Error('Failed to create recording');
+      if (insertError) {
+        console.error('[Upload] Database insert error:', insertError);
+        throw new Error(`Failed to create recording: ${insertError.message}`);
+      }
+      
+      if (!recording) {
+        throw new Error('Failed to create recording: No data returned');
+      }
+      
+      console.log('[Upload] Recording created in database:', recording.id);
 
       clearInterval(uploadInterval);
       setUploadProgress(100);
@@ -188,8 +185,12 @@ export function RecordingInterface() {
       setProcessingState('complete');
     } catch (error) {
       console.error('Processing error:', error);
+      clearInterval(uploadInterval);
       setProcessingState('idle');
-      alert('Failed to process video. Please try again.');
+      setUploadProgress(0);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Failed to process video: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
     }
   };
 
@@ -437,7 +438,7 @@ export function RecordingInterface() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-start gap-2">
-              <AlertCircle className="text-amber-600 flex-shrink-0" size={16} />
+              <CheckCircle className="text-green-600 flex-shrink-0" size={16} />
               <p className="text-muted-foreground">Videos are stored securely for processing</p>
             </div>
           </CardContent>
